@@ -1,0 +1,18 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+{% if os.type != null %}
+<form action="/os/updateOsType/{{os._id}}" method="POST"class="container">
+{% else %}
+<form action="/os/addOsType" method="POST"class="container">
+{% endif %}
+  <div class="form-group">
+    <label for="name">OS Type</label>
+    <input type="text" class="form-control" 
+    id="type" aria-describedby="datacenter" 
+    placeholder="Enter OS type"
+    name="type" value="{{os.type}}">
+  </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

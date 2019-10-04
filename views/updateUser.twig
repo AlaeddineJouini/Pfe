@@ -1,0 +1,401 @@
+{% extends 'layout.twig' %}
+
+{% block body %}         
+
+
+   
+
+
+    <form action="/users/updateUser/{{user._id}}" method="POST"  autocomplete="off">
+
+    <div class="form-row">
+    
+   
+   
+<!--
+    separation
+-->
+
+
+ 
+ 
+ 
+   
+
+
+
+
+
+
+    
+
+    
+
+    <div class="form-group col-md-6">
+        <label>Cloud </label>
+        <select   class="form-control"  id="selectListDC" name="selectListDC" >
+            {% for d in c %}
+            {% if d.name == user.cloud %}
+            <option selected value="{{d.name}}">{{d.name}}</option> 
+            {% else %} 
+            <option value="{{d.name}}">{{d.name}}</option> 
+            {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+
+
+    <div id="DCdiv" class="form-group col-md-6"> 
+    <label>Cluster</label>
+    
+    
+    
+
+    </div>
+
+
+    <div id="DSdiv" class="form-group col-md-6"> 
+    <label>Data Store</label>
+     
+
+    </div>
+
+    <div id="DCenterDiv" class="form-group col-md-6">
+        <label>Datacenter</label>
+       
+    </div>
+
+
+
+
+    
+ 
+ 
+
+ 
+
+    
+    
+
+
+
+<br>
+
+
+
+
+
+
+<div class="form-group col-md-6">
+        <label>domain name</label>
+        <input type="text" class="form-control" name="dn" value={{user.dn}}>
+         
+ </div>
+
+
+ <div class="form-group col-md-6">
+        <label>Gateway</label>
+        <input type="text" class="form-control" name="gw" value={{user.gw}}>
+         
+ </div>
+ <div class="form-group col-md-6">
+    <label>First ip</label>
+    <input type="text" class="form-control" name="fip" >
+     
+</div>
+
+
+<div class="form-group col-md-6">
+    <label>Last ip</label>
+    <input type="text" class="form-control" name="lip" >
+     
+</div>
+
+ <div class="form-group col-md-6">
+        <label>dns server</label>
+        <input type="text" class="form-control" name="dns" value={{user.dns}} >
+         
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+</div>
+
+<div class="form-group">
+    <button type="submit" class="btn btn-info"><i class="fa fa-database"></i>Submit</button>
+   
+
+</div>
+
+
+
+
+
+
+<script src="/js/jquery.min.js"></script>
+<script src="/bs/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    isObject = function(a) {
+    return (!!a) && (a.constructor === Object);
+    };
+    isArray = function(a) {
+    return (!!a) && (a.constructor === Array);
+    };
+  $(document).ready(function () {
+   
+
+   // var cluster =document.getElementById("Cluster");
+    
+    var dsdiv =document.getElementById('DSdiv');
+    var dcdiv =document.getElementById("DCdiv");
+    var DCenterdiv = document.getElementById("DCenterDiv")
+    $('#selectListDC').change(function () {
+        //$('#Cluster').empty();
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/vm/getClDs",
+            data: { Dc: $(this).val()},
+            datatype: "json",
+            beforeSend: function(){
+                 while(dcdiv.firstChild){
+                    dcdiv.removeChild(dcdiv.firstChild);
+                 }
+                 while(dsdiv.firstChild){
+                    dsdiv.removeChild(dsdiv.firstChild);
+                 }
+                 while(DCenterdiv.firstChild){
+                    DCenterdiv.removeChild(DCenterdiv.firstChild);
+                 }
+                 
+                 $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )
+                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCdiv" )
+                $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DSdiv" )
+                $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCenterDiv" )
+            },
+            complete: function(){
+                
+            },
+            success: function (res) {
+                while(dcdiv.firstChild){
+                    dcdiv.removeChild(dcdiv.firstChild);
+                 }
+                 while(dsdiv.firstChild){
+                    dsdiv.removeChild(dsdiv.firstChild);
+                 }
+                 while(DCenterdiv.firstChild){
+                    DCenterdiv.removeChild(DCenterdiv.firstChild);
+                 }
+                 
+            $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )   
+            $( " <select   class='form-control' id='Cluster' name='Cluster'></select>" ).appendTo( "#DCdiv" )
+            $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+            $( " <select   class='form-control' id='DS' name='DS'></select>" ).appendTo( "#DSdiv" )
+            $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+            $( " <select   class='form-control' id='DCenter' name='DCenter'></select>" ).appendTo( "#DCenterDiv" )
+                //new added for test
+            var cluster =document.getElementById("Cluster");
+            var DCenter =document.getElementById("DCenter");
+            var dataStore = document.getElementById("DS");
+                console.log(res.cl)
+                /*var option=document.createElement("option");
+                option.text="{{user.email}}"
+                cluster.add(option)*/
+            if(isArray(res.cl)){
+                for(cl of res.cl){
+                console.log(cl.name)
+                var option=document.createElement("option");
+                option.text=cl.Name 
+                if(cl.Name === "{{user.cluster}}"){
+                option.selected =true;
+                }
+                cluster.add(option)
+                }
+            }else{
+                console.log(res.cl.name)
+                var option=document.createElement("option");
+                option.text=res.cl.Name 
+                if(res.cl.Name === "{{user.cluster}}"){
+                option.selected =true;
+                }
+                cluster.add(option)
+            }
+            if(isArray(res.dcenter)){
+                for(d of res.dcenter){
+                console.log(d.name)
+                var option=document.createElement("option");
+                option.text=d.Name 
+                if(d.Name === "{{user.dc}}"){
+                option.selected =true;
+                }
+                DCenter.add(option)
+                }
+            }else{
+                console.log(res.dcenter.Name)
+                var option=document.createElement("option");
+                option.text=res.dcenter.Name 
+                if(res.dcenter.Name === "{{user.dc}}"){
+                option.selected =true;
+                }
+                DCenter.add(option)
+            }
+            for (ds of res.ds){
+                console.log(ds.Name)
+                var option=document.createElement("option");
+                option.text=''+ds.Name+'|'+ds.FreeSpaceGB+' GB';
+                if(ds.Name === "{{user.ds}}"){
+                option.selected =true;
+                }
+                dataStore.add(option)
+            }
+            }
+         });
+     });
+
+
+    });
+
+
+
+
+</script>
+<script>
+    window.onload = function() {
+  
+
+    isObject = function(a) {
+    return (!!a) && (a.constructor === Object);
+    };
+    isArray = function(a) {
+    return (!!a) && (a.constructor === Array);
+    };
+  $(document).ready(function () {
+   
+
+   // var cluster =document.getElementById("Cluster");
+    
+    var dsdiv =document.getElementById('DSdiv');
+    var dcdiv =document.getElementById("DCdiv");
+    var DCenterdiv = document.getElementById("DCenterDiv");
+    var cloud =document.getElementById("selectListDC");
+        //$('#Cluster').empty();
+        console.log('hiiiiiiiii : '+ cloud.value)
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/vm/getClDs",
+            data: { Dc: cloud.value},
+            datatype: "json",
+            beforeSend: function(){
+                 while(dcdiv.firstChild){
+                    dcdiv.removeChild(dcdiv.firstChild);
+                 }
+                 while(dsdiv.firstChild){
+                    dsdiv.removeChild(dsdiv.firstChild);
+                 }
+                 while(DCenterdiv.firstChild){
+                    DCenterdiv.removeChild(DCenterdiv.firstChild);
+                 }
+                 
+                 $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )
+                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCdiv" )
+                $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DSdiv" )
+                $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCenterDiv" )
+            },
+            complete: function(){
+                
+            },
+            success: function (res) {
+                while(dcdiv.firstChild){
+                    dcdiv.removeChild(dcdiv.firstChild);
+                 }
+                 while(dsdiv.firstChild){
+                    dsdiv.removeChild(dsdiv.firstChild);
+                 }
+                 while(DCenterdiv.firstChild){
+                    DCenterdiv.removeChild(DCenterdiv.firstChild);
+                 }
+                 
+            $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )   
+            $( " <select   class='form-control' id='Cluster' name='Cluster'></select>" ).appendTo( "#DCdiv" )
+            $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+            $( " <select   class='form-control' id='DS' name='DS'></select>" ).appendTo( "#DSdiv" )
+            $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+            $( " <select   class='form-control' id='DCenter' name='DCenter'></select>" ).appendTo( "#DCenterDiv" )
+                //new added for test
+            var cluster =document.getElementById("Cluster");
+            var DCenter =document.getElementById("DCenter");
+            var dataStore = document.getElementById("DS");
+                console.log(res.cl)
+                /*var option=document.createElement("option");
+                option.text="{{user.email}}"
+                cluster.add(option)*/
+            if(isArray(res.cl)){
+                for(cl of res.cl){
+                console.log(cl.Name)
+                var option=document.createElement("option");
+                option.text=cl.Name 
+                if(cl.Name === "{{user.cluster}}"){
+                option.selected =true;
+                }
+                cluster.add(option)
+                }
+            }else{
+                console.log(res.cl.Name)
+                var option=document.createElement("option");
+                option.text=res.cl.Name 
+                if(res.cl.Name === "{{user.cluster}}"){
+                option.selected =true;
+                }
+                cluster.add(option)
+            }
+            if(isArray(res.dcenter)){
+                for(d of res.dcenter){
+                console.log(d.name)
+                var option=document.createElement("option");
+                option.text=d.Name 
+                if(d.Name === "{{user.dc}}"){
+                option.selected =true;
+                }
+                DCenter.add(option)
+                }
+            }else{
+                console.log(res.dcenter.Name)
+                var option=document.createElement("option");
+                option.text=res.dcenter.Name 
+                if(res.dcenter.Name === "{{user.dc}}"){
+                option.selected =true;
+                }
+                DCenter.add(option)
+            }
+            for (ds of res.ds){
+                console.log(ds.Name)
+                var option=document.createElement("option");
+                option.text=''+ds.Name+'|'+ds.FreeSpaceGB+' GB';
+                if(ds.Name === "{{user.ds}}"){
+                option.selected =true;
+                }
+                dataStore.add(option)
+            }
+            }
+         });
+    
+
+
+    });
+
+
+};
+
+</script>
+
+{% endblock %}

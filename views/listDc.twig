@@ -1,0 +1,30 @@
+{% extends 'layout.twig' %}
+
+{% block body %}         
+<div class="container">            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>name</th>
+        <th>adress</th>
+        <th>user</th>
+        <th>password</th>
+        </tr>
+    </thead>
+    <tbody>
+     {% for d in dc %}
+      <tr>
+        <td>{{d.name}}</td>
+        <td>{{d.adress}}</td>
+        <td>{{d.user}}</td>
+        <td>{{d.password}}</td>
+        
+         <td> <button type="submit" class="btn btn-primary"><a href="/dataCenter/updateDc/{{d._id}}">update</a></button></td>
+          <td> <button type="submit" class="btn btn-primary"><a href="/dataCenter/removeDc/{{d._id}}">delete</a></button></td>
+      </tr>
+       {% endfor %}
+    </tbody>
+  </table>
+</div> 
+
+{% endblock %}

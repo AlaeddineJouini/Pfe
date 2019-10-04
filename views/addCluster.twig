@@ -1,0 +1,18 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+{% if cl.name != null %}
+<form action="/cluster/updateCluster/{{cl._id}}" method="POST"class="container">
+{% else %}
+<form action="/cluster/addCluster/{{id}}" method="POST"class="container">
+{% endif %}
+  <div class="form-group">
+    <label for="name">name</label>
+    <input type="text" class="form-control" 
+    id="name" aria-describedby="cluster" 
+    placeholder="Enter cluster's name"
+    name="name" value="{{cl.name}}">
+  </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

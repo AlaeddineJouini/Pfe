@@ -1,0 +1,39 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+{% if dc.name != null %}
+<form action="/dataCenter/updateDc/{{dc._id}}" method="POST"class="container">
+{% else %}
+<form action="/dataCenter/addDc" method="POST"class="container">
+{% endif %}
+    <div class="form-group">
+    <label for="name">name</label>
+    <input type="text" class="form-control" 
+    id="name" aria-describedby="datacenter" 
+    placeholder="Enter data center's name"
+    name="name" value="{{dc.name}}">
+    </div>
+    <div class="form-group">
+        <label for="adress">adress</label>
+        <input type="text" class="form-control" 
+        id="adress" aria-describedby="adress" 
+        placeholder="Enter adress"
+        name="adress" value="{{dc.adress}}">
+      </div>
+      <div class="form-group">
+        <label for="user">user</label>
+        <input type="text" class="form-control" 
+        id="user" aria-describedby="user" 
+        placeholder="Enter adress"
+        name="user" value="{{dc.user}}">
+      </div>
+      <div class="form-group">
+        <label for="password">password</label>
+        <input type="text" class="form-control" 
+        id="password" aria-describedby="password" 
+        placeholder="Enter adress"
+        name="password" value="{{dc.password}}">
+      </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

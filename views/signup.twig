@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="/bs/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body class="container">
+<form action="/auth/signup" method="POST" autocomplete="off">
+    <div class="form-row">  
+        <div class="form-group col-md-6">
+            <label>First name</label>
+            <input type="text" class="form-control" name="firstName"  >
+        </div>
+        <div class="form-group col-md-6">
+            <label>Last name</label>
+            <input type="text" class="form-control" name="lastName"  >
+        </div>
+    </div>
+      
+    <div class="form-row">  
+        <div class="form-group col-md-6">
+            <label>Email</label>
+            <input required
+            type="email"
+            class="form-control"
+            name="email"  > 
+        </div>
+        <div class="form-group col-md-6">
+            <label>Password</label>
+            <input type="password" class="form-control" name="password"  >
+        </div>
+
+       
+    </div>
+    <div class="form-group col-md-6">
+        <label>Confirm password</label>
+        <input type="password" class="form-control" name="Cpassword"  >
+    </div>
+   
+     <!--
+    <div class="form-group col-md-6">
+        <label>age</label>
+        <input type="number" class="form-control" name="age"  >
+    </div>-->
+    <div class="form-group">
+        <button type="submit" class="btn btn-info"><i class="fa fa-database"></i>Submit</button>
+    </div>
+</body>
+</html>

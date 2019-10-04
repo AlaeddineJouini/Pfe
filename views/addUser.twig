@@ -1,0 +1,17 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+<form action="/addUser" method="POST"class="container">
+  <div class="form-group">
+    <label for="pseudo">pseudo</label>
+    <input type="text" class="form-control"  
+    name="pseudo" >
+  </div>
+  <div class="form-group">
+        <label for="password">password</label>
+        <input type="password" class="form-control"  
+        name="password" >
+      </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

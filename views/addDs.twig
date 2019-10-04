@@ -1,0 +1,21 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+{% if ds.name != null %}
+<form action="/dataStorage/updateDs/{{ds._id}}" method="POST"class="container">
+{% else %}
+<form class="container" action="/dataStorage/addDs/{{id}}" method="POST">
+{% endif %}
+
+   <!-- <input type="text" class="form-control" id="id" aria-describedby="datastorage" name="id" value="{{id}}" disabled hidden>
+  -->
+  <div class="form-group">
+    <label for="name">name</label>
+    <input type="text" class="form-control" id="name" aria-describedby="datastorage"
+    placeholder="Enter data storage's name"
+    name="name"
+    value="{{ds.name}}">
+  </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

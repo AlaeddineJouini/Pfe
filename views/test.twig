@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="/bs/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body class="container">
+
+
+    <!--    <b>hello<span>{{user._id}}</span></b>-->
+
+
+        {% if data.name != null %}
+        <form action="/vm/updateVm/{{data._id}}" method="POST"  autocomplete="off">
+        {% else %}
+        <form action="/vm/addVm/" method="POST" autocomplete="off">
+        {% endif %}
+
+
+    <div class="form-row">
+    
+   
+   
+<!--
+    separation
+-->
+
+
+ 
+ 
+ 
+   
+
+
+
+
+
+
+    
+
+    
+
+    <div class="form-group col-md-6">
+        <label>Cloud </label>
+        <select   class="form-control"  id="selectListDC" name="selectListDC" >
+            <option  selected disabled></option>
+            {% for d in c %}
+            <option value="{{d.name}}">{{d.name}}</option>  
+            {% endfor %}
+        </select>
+    </div>
+
+
+    <div id="DCdiv" class="form-group col-md-6"> 
+    <label>Cluster</label>
+    
+    
+
+    </div>
+
+
+    <div id="DSdiv" class="form-group col-md-6"> 
+    <label>Data Store</label>
+     <select   class="form-control"  id="DS" name="DS">
+         
+    </select>
+
+    </div>
+
+    <div id="DCenterDiv" class="form-group col-md-6">
+        <label>Datacenter</label>
+        <select   class="form-control"  id="Dcenter" name="Dcenter">
+         
+        </select>
+    </div>
+
+
+
+
+    <div class="form-group col-md-6">
+        <label>vm name</label>
+        <input type="text" class="form-control" name="vmname" >
+         
+    </div>
+    <div class="form-group col-md-6">
+        <label>vm password</label>
+        <input type="text" class="form-control" name="vmpw" >
+         
+ </div>
+
+ <div class="form-group col-md-6">
+    <label>OS</label>
+    <select   class="form-control"  id="selectListOS" name="selectListOS">
+       {% if data.name != null %}
+       <option value="{{data.osType.type}}">{{data.osType.type}}</option>  
+       {% else %}
+       <option  selected disabled></option>
+        {% for os in osType %}
+        <option value="{{os.type}}">{{os.type}}</option>  
+        {% endfor %}
+        {% endif %}
+    </select>  
+</div>  
+
+ {% if data.name != null %}
+    <div  class="form-group col-md-6"> 
+            <label>OS details</label>
+            <select   class="form-control"  name="detailListOS">
+                <option value ={{data.os.name}}>{{data.os.name}}</option>
+            </select>
+        </div>  
+    {% else %}
+    <div id="OSdiv" class="form-group col-md-6"> 
+        <label>OS details</label>
+        <select   class="form-control"  id="detailListOS" name="detailListOS">
+        </select>
+    </div>  
+    {% endif %} 
+
+
+ <div class="form-group col-md-6">
+    <label>folder</label>
+    <input type="text" class="form-control" name="folder" >
+     
+</div>
+
+    <div class="form-group col-md-6">
+        <label>cpus number</label>
+        <input type="number" class="form-control" name="cpus" >
+         
+    </div>
+    <div class="form-group col-md-6">
+        <label>Memory</label>
+        <input type="text" class="form-control" name="ram" >
+         
+    </div>
+
+    <div class="form-group col-md-2">
+        <label>number of disks </label>
+        <select   class="form-control"  id="selectList" name="selectList" onchange="selc()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+         
+    </div>        
+
+<div id="disks" class="form-group col-md-10"> 
+    <label>disk1</label><br> 
+    <input style="display:inline-block;margin-right:50px;"type="number" class="form-control col-md-6" name="disk1" placeholder="capacity of disk1" >
+    <input type="checkbox" class="check-box disks" name="pdisk1" id="pdisk1" onchange="persistent(this);"><label style="display:inline-block;margin-left:20px;">persistent?</label><br>
+</div>
+<br>
+
+<div class="col-md-12">
+<div class="form-group col-md-3">
+        <label>number of networks </label>
+        <select   class="form-control"  id="selectListnet" name="selectListnet" onchange="selcNet()" >
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+         
+    </div>        
+<div class="form-row">
+<div id="networksvlan" class="col-md-2"> 
+    <label>network 1 vlan</label><br> 
+    <input style="width: 100%" type="number" name="vlan1" placeholder="network1 vlan" >
+</div>
+<div id="networksip" class="col-md-6 offset-md-1"> 
+    <label>network 1 ip</label><br> 
+    <input style="width: 100%" type="text" name="ip1" placeholder="network1 ip" >
+</div>
+<div id="networkscidr" class="col-md-2 offset-md-1"> 
+    <label>network 1 cidr</label><br> 
+    <input style="width: 100%" type="number" max="32" name="cidr1" placeholder="network1 ip" >
+</div>
+</div>
+</div>
+
+
+
+
+<div class="form-group col-md-6">
+        <label>domain name</label>
+        <input type="text" class="form-control" name="dn" >
+         
+ </div>
+
+
+ <div class="form-group col-md-6">
+        <label>Gateway</label>
+        <input type="text" class="form-control" name="gw" >
+         
+ </div>
+
+ <div class="form-group col-md-6">
+        <label>dns server</label>
+        <input type="text" class="form-control" name="dns" >
+         
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+</div>
+
+<div class="form-group">
+    <button type="submit" class="btn btn-info"><i class="fa fa-database"></i>Submit</button>
+   
+
+</div>
+
+
+
+
+
+
+<script src="/js/jquery.min.js"></script>
+<script src="/bs/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    isObject = function(a) {
+    return (!!a) && (a.constructor === Object);
+    };
+    isArray = function(a) {
+    return (!!a) && (a.constructor === Array);
+    };
+  $(document).ready(function () {
+    var detailListOS =document.getElementById("detailListOS");
+    $('#selectListOS').change(function () {
+        $('#detailListOS').empty();
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/vm/getOsNames",
+            data: { type: $(this).val()},
+            datatype: "json",
+            success: function (res) {
+               
+            for (r of res){
+                var option=document.createElement("option");
+                option.text=r.name
+                detailListOS.add(option)
+            }
+            }
+         });
+     });
+
+   // var cluster =document.getElementById("Cluster");
+    var dataStore = document.getElementById("DS");
+    var dcdiv =document.getElementById("DCdiv");
+    var DCenter = document.getElementById("DCenterDiv")
+    $('#selectListDC').change(function () {
+        //$('#Cluster').empty();
+        $('#DS').empty();
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/vm/getClDs",
+            data: { Dc: $(this).val()},
+            datatype: "json",
+            beforeSend: function(){
+                 while(dcdiv.firstChild){
+                    dcdiv.removeChild(dcdiv.firstChild);
+                 }
+                 
+                 $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )
+                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCdiv" )
+            },
+            complete: function(){
+                
+            },
+            success: function (res) {
+                while(dcdiv.firstChild){
+                    dcdiv.removeChild(dcdiv.firstChild);
+                 }
+            $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )   
+            $( " <select   class='form-control' id='Cluster' name='Cluster'></select>" ).appendTo( "#DCdiv" )
+                //new added for test
+            var cluster =document.getElementById("Cluster");
+                console.log(res.cl)
+            if(isArray(res.cl)){
+                for(cl of res.cl){
+                console.log(cl.name)
+                var option=document.createElement("option");
+                option.text=cl.Name 
+                cluster.add(option)
+                }
+            }else{
+                console.log(res.cl.name)
+                var option=document.createElement("option");
+                option.text=res.cl.Name 
+                cluster.add(option)
+            }
+            if(isArray(res.dcenter)){
+                for(d of res.dcenter){
+                console.log(dcenter.name)
+                var option=document.createElement("option");
+                option.text=dcenter.Name 
+                Dcenter.add(option)
+                }
+            }else{
+                console.log(res.dcenter.Name)
+                var option=document.createElement("option");
+                option.text=res.dcenter.Name 
+                Dcenter.add(option)
+            }
+            for (ds of res.ds){
+                console.log(ds.Name)
+                var option=document.createElement("option");
+                option.text=''+ds.Name+'|'+ds.FreeSpaceGB+' GB'
+                dataStore.add(option)
+            }
+            }
+         });
+     });
+
+
+    });
+
+function selc(){
+    
+    var selectList =document.getElementById("selectList");
+    var disks =document.getElementById("disks");
+    var nbDisks=selectList.value;
+   var componentDisks ='';
+  while(disks.firstChild){
+    disks.removeChild(disks.firstChild);
+}
+for (var j = 1;j <= nbDisks; j++) {
+  console.log(j);
+  componentDisks +='<label>disk'+j+'</label><br> <input style="display:inline-block;margin-right:50px;"type="number" class="form-control col-md-6" name="disk'+j+'" placeholder="capacity of disk'+j+'"   > <input type="checkbox" class="check-box" name="pdisk'+j+'" id="pdisk'+j+'" onchange="persistent(this);"><label style="display:inline-block;margin-left:20px;">persistent?</label><br>' ;
+
+}
+disks.innerHTML=componentDisks;
+}
+
+function selcNet(){
+    
+    var selectListnet =document.getElementById("selectListnet");
+    var networksvlan =document.getElementById("networksvlan");
+    var networkscidr =document.getElementById("networkscidr");
+    var networksip =document.getElementById("networksip");
+    var nbNet=selectListnet.value;
+   var componentvl ='';
+   var componentip ='';
+   var componentcidr='';
+  /*while(disks.firstChild){
+    disks.removeChild(disks.firstChild);
+}*/
+for (var j = 1;j <= nbNet; j++) {
+  console.log(j);
+  componentvl +='<label>network'+j+'vlan </label><br> <input style="display:inline-block;margin-right:50px;"type="number" class="form-control col-md-6" name="vlan'+j+'" placeholder="network'+j+' vlan" > <br> '
+  componentip +='<label>network'+j+'ip</label><br> <input style="display:inline-block;margin-right:50px;"type="text" class="form-control col-md-6" name="ip'+j+'" placeholder="network'+j+' ip" > <br>' 
+  componentcidr +='<label>network'+j+'cidr</label><br> <input style="display:inline-block;margin-right:50px;"type="number"max="32" class="form-control col-md-6" name="cidr'+j+'"> <br>'
+}
+networksip.innerHTML=componentip;
+networksvlan.innerHTML=componentvl;
+networkscidr.innerHTML=componentcidr;
+}
+var check=false;
+function persistent(k){
+     
+    
+    if($('#'+k.id).prop("checked") == true){
+        check =true;
+    }else{
+        check=false;
+    }
+    if(check){
+        $('#'+k.id).before('<input style="display:inline-block;margin-right:50px;"type="text" class="form-control col-md-6" name="name'+k.id+'" id="name'+k.id+'" placeholder="name of disk1" >')
+    }else
+    $('#name'+k.id).remove();
+  
+}
+
+</script>
+</body>
+</html>

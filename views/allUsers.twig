@@ -1,0 +1,25 @@
+{% extends 'layout.twig' %}
+
+{% block body %}         
+<div class="container">            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>email</th>
+        <th>vlan</th>
+        </tr>
+    </thead>
+    <tbody>
+     {% for u in users %}
+      <tr>
+        <td>{{u.email}}</td>
+        <td>{{u.vlan}}</td>
+         <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/{{u._id}}">update</a></button></td>
+          <td> <button type="submit" class="btn btn-primary"><a href="/users/removeUser/{{u._id}}">delete</a></button></td>
+      </tr>
+       {% endfor %}
+    </tbody>
+  </table>
+</div> 
+
+{% endblock %}

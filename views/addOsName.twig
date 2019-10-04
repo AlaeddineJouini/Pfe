@@ -1,0 +1,21 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+{% if os.name != null %}
+<form action="/os/updateOsName/{{os._id}}" method="POST"class="container">
+{% else %}
+<form class="container" action="/os/addOsName/{{id}}" method="POST">
+{% endif %}
+
+   <!-- <input type="text" class="form-control" id="id" aria-describedby="datastorage" name="id" value="{{id}}" disabled hidden>
+  -->
+  <div class="form-group">
+    <label for="name">name</label>
+    <input type="text" class="form-control" id="name" aria-describedby="osName"
+    placeholder="Enter OS name"
+    name="name"
+    value="{{os.name}}">
+  </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

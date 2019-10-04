@@ -1,0 +1,59 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+ <br>
+ <br>
+<div class="container">            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>name</th>
+        </tr>
+    </thead>
+    <tbody>
+     {% for ds in dss %}
+      <tr>
+        <td>{{ds.name}}</td>
+        <td> <button type="submit" class="btn btn-primary"><a href="/dataStorage/removeDs/{{ds._id}}">delete</a></button></td>
+         <td> <button type="submit" class="btn btn-primary"><a href="/dataStorage/updateDs/{{ds._id}}">update</a></button></td>
+      </tr>
+       {% endfor %}
+    </tbody>
+  </table>
+</div> 
+
+
+<button type="button" id="ds" class="btn btn-info">
+                <i class="fas fa-align-left"></i>
+                <span><a href="/dataStorage/addDs/{{id}}">add a data storage</a></span>
+            </button>
+
+<br>
+<br>
+ 
+<div class="container">            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>name</th>
+        </tr>
+    </thead>
+    <tbody>
+     {% for cl in clusters %}
+      <tr>
+        <td>{{cl.name}}</td>
+         <td> <button type="submit" class="btn btn-primary"><a href="/cluster/removeCluster/{{cl._id}}">delete</a></button></td>
+        <td> <button type="submit" class="btn btn-primary"><a href="/cluster/updateCluster/{{cl._id}}">update</a></button></td>
+      </tr>
+       {% endfor %}
+    </tbody>
+  </table>
+</div> 
+<button type="button" id="cl" class="btn btn-info">
+                <i class="fas fa-align-left"></i>
+                <span><a href="/cluster/addCluster/{{id}}">add a cluster</a></span>
+            </button>
+
+
+ 
+{% endblock %}

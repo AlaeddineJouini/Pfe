@@ -1,0 +1,9 @@
+resource "vsphere_virtual_disk" per1" { 
+ size         =100  
+vmdk_path    = "${var.extra_vmdk_name}"
+datacenter   = "${var.datacenter}"
+datastore    = "${var.datastore}"
+type         = "thin"
+adapter_type = "lsiLogic"
+}
+

@@ -1,0 +1,24 @@
+{% extends 'layout.twig' %}
+
+{% block body %}         
+<div class="container">            
+  <table class="table">
+    <thead>
+      <tr>
+        <th> OS Type</th>
+        </tr>
+    </thead>
+    <tbody>
+     {% for os in osType %}
+      <tr>
+        <td>{{os.type}}</td>
+        <td> <button type="submit" class="btn btn-primary"><a href="/os/osDetails/{{os._id}}">view Details</a></button></td>
+         <td> <button type="submit" class="btn btn-primary"><a href="/os/updateOsType/{{os._id}}">update</a></button></td>
+          <td> <button type="submit" class="btn btn-primary"><a href="/os/removeOsType/{{os._id}}">delete</a></button></td>
+      </tr>
+       {% endfor %}
+    </tbody>
+  </table>
+</div> 
+
+{% endblock %}

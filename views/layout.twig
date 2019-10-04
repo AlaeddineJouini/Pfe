@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link href="/bs/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+ <div class="wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>admin backOffice</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+            <li class="active">
+                <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">My Clouds</a>
+                <ul class="collapse list-unstyled" id="homeSubmenu">
+                    
+                    <li>
+                        <a class="active" href="/dataCenter/listDc">list Clouds</a>
+                    </li>
+                    <li>
+                        <a href="/dataCenter/addDc">Add Cloud</a>
+                    </li>
+                   
+                </ul>
+            </li>
+           
+            <li class="active">
+                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Operating Systems</a>
+                <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <li>
+                        <a href="/os/listOs">list operating System</a>
+                    </li>
+                    <li>
+                        <a href="/os/addOsType">Add an operating System</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="active">
+                <a href="#Submenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Users</a>
+                <ul class="collapse list-unstyled" id="Submenu">
+                    <li>
+                        <a href="/users/getUsers">All users</a>
+                    </li>
+                    <li>
+                        <a href="/os/addOsType">Validate user</a>
+                    </li>
+                    <li>
+                        <a href="/os/addOsType">Activate user</a>
+                    </li>
+                </ul>
+            </li>
+            
+        </ul>
+    </nav>
+
+
+<div id="content">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+
+            <button type="button" id="sidebarCollapse" class="btn btn-info">
+                <i class="fas fa-align-left"></i>
+                <span>Toggle Sidebar</span>
+            </button>
+            <button type="button" class="btn btn-info">
+                <span><a href ="/auth/logout">logout</a></span>
+            </button>
+
+        </div>
+    </nav>
+    {% block body %}{% endblock %}
+</div>
+</div>
+    
+
+
+
+
+
+
+  <script src="/js/jquery.min.js"></script>
+  <script src="/bs/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Menu Toggle Script -->
+  <script>
+   $(document).ready(function () {
+
+    $('#sidebarCollapse').on('click', function () {
+        $('#sidebar').toggleClass('active');
+    });
+
+});
+  </script>
+
+  </body>
+</html>
