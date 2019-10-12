@@ -1,0 +1,70 @@
+{% extends 'layout.twig' %}
+
+{% block body %}         
+hello
+<!--
+{% for cp in cpt %}
+<p>{{cp.Name}}</p><br>
+<p>{{cp.NumCpu}}</p><br>
+<p>{{cp.CpuUsageMhz}}</p><br>
+<p>{{cp.CpuTotalMhz}}</p><br>
+<p>{{cp.MemoryUsageGB}}</p><br>
+<p>{{cp.MemoryTotalGB}}</p><br>
+
+{% endfor %}
+-->
+<div>
+<div class="ct">
+        <div>exi1</div>
+        {% for cp in cpt %}
+    <div class="box">
+        <div class="chart" data-percent="{{(cp.CpuUsageMhz * 100 / cp.CpuTotalMhz) | number_format(1, '.', ',') }}"><span >{{(cp.CpuUsageMhz * 100 / cp.CpuTotalMhz) | number_format(1, '.', ',') }} %</span></div>
+        <h4>{{cp.Name | slice(0, 6)}}</h4>
+    </div>
+    {% endfor %}
+</div>
+</div>
+<br>
+<div>
+<div class="ct1">
+        
+    <div>exi1</div>
+    {% for cp in cpt %}
+     
+    <div class="box">
+        <div class="chart" data-percent="{{(cp.MemoryUsageGB * 100 / cp.MemoryTotalGB) | number_format(1, '.', ',') }}"><span >{{(cp.MemoryUsageGB * 100 / cp.MemoryTotalGB) | number_format(1, '.', ',') }} %</span></div>
+        <h4>{{cp.Name | slice(0, 6)}}</h4>
+    </div>
+    {% endfor %}
+</div>
+</div>
+
+
+<!--<canvas id="myChart" width="400" height="400"></canvas>-->
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="/easyPieChart/dist/jquery.easypiechart.js"></script>
+<script src="/bs/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/countup/countUp.js"></script>
+
+<script>
+       
+$(function(){
+    $('.chart').easyPieChart({
+        size : 180,
+        barColor : '#17d3e6',
+        scaleColor : false,
+        lineWidth : 15,
+        trackColor :'#373737',
+        animate : 4000
+    });
+});
+
+
+</script>
+<script>
+        var c =new CountUp('counter',0,100,1,4);
+        c.start();
+</script>
+
+{% endblock %}

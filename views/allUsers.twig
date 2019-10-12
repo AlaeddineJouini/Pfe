@@ -1,7 +1,11 @@
 {% extends 'layout.twig' %}
 
 {% block body %}         
-<div class="container">            
+<div class="container">      
+    <div class="form-group col-md-6">
+        <label>search</label>
+        <input type="text" class="form-control" name="search" id="search" placeholder="search by email" >
+    </div>      
   <table class="table">
     <thead>
       <tr>
@@ -9,17 +13,79 @@
         <th>vlan</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id='tb'>
      {% for u in users %}
       <tr>
         <td>{{u.email}}</td>
         <td>{{u.vlan}}</td>
-         <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/{{u._id}}">update</a></button></td>
-          <td> <button type="submit" class="btn btn-primary"><a href="/users/removeUser/{{u._id}}">delete</a></button></td>
+        {% if type == 'getUsers' %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/{{u._id}}">update</a></button></td>
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/removeUser/{{u._id}}">delete</a></button></td>
+        {% elseif type =='getNotVerified' %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/{{u._id}}">validate</a></button></td>
+        {% else %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/activateUser/{{u._id}}">activate</a></button></td>
+        {% endif %}
+
       </tr>
        {% endfor %}
     </tbody>
   </table>
 </div> 
+<script src="/js/jquery.min.js"></script>
+<script src="/bs/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    isArray = function(a) {
+    return (!!a) && (a.constructor === Array);
+    };
+  var tb=document.getElementById('tb');
+  var type='{{type}}';
+  $('#search').keyup(function () {
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/users/searchUser",
+            data: { sr: $(this).val(),type :type },
+            datatype: "json",
+            success: function (res) {
+              while(tb.firstChild){
+                    tb.removeChild(tb.firstChild);
+                 }
+                 console.log(res.data)
+            if(isArray(res.data)){
+            for (r of res.data){
+            
+                $("#tb").append(`<tr>
+        <td>${r.email}</td>
+        <td>${r.vlan}</td>
+        {% if type == 'getUsers' %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/${r._id}">update</a></button></td>
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/removeUser/${r._id}">delete</a></button></td>
+        {% elseif type =='getNotVerified' %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/${r._id}">validate</a></button></td>
+        {% else %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/activateUser/${r._id}">activate</a></button></td>
+        {% endif %}
+      </tr>`)
+            }
+          }else{
+            $("#tb").append(`<tr>
+        <td>${res.data.email}</td>
+        <td>${res.data.vlan}</td>
+        {% if type == 'getUsers' %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/${res.data._id}">update</a></button></td>
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/removeUser/${res.data._id}">delete</a></button></td>
+        {% elseif type =='getNotVerified' %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/updateUser/${res.data._id}">validate</a></button></td>
+        {% else %}
+        <td> <button type="submit" class="btn btn-primary"><a href="/users/activateUser/${res.data._id}">activate</a></button></td>
+        {% endif %}
+      </tr>`)
+
+          }
+            }
+         });
+     });
+
+</script>
 
 {% endblock %}

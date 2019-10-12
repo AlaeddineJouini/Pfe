@@ -1,6 +1,7 @@
 const LocalStrategy = require('passport-local').Strategy;
 // Models
 const User = require('../models/user');
+const Vlan =require('../models/vlan')
 
 
 
@@ -63,21 +64,36 @@ module.exports = function(passport) {
                 // fail the signup
                 return done(null, false);
             }
+            Vlan.findOne({}).then(doc=>{
+                new User({
+                    email: email,
+                    // hash/encrypt password before storing it in the database
+                    password: User.generateHash(password),
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    vlan : doc.vnum +1
+                }).save(function(err, savedUser) {
+                    if (err) {
+                        return done(err, false)
+                    }
+                    let Object ={
+                        vnum : doc.vnum +1
+                    }
+                    Vlan.updateOne({name :'vlan'},Object,(e)=>{
+                        console.log(e)
+                    })
+                    
+                    //houni bch tab3eth mail
+                    //mba3dha bch tasna3 vlan fel vsphere
 
-            // otherwise store user info in the Database
-            new User({
-                email: email,
-                // hash/encrypt password before storing it in the database
-                password: User.generateHash(password),
-                firstName: req.body.firstName,
-                lastName: req.body.lastName
-            }).save(function(err, savedUser) {
-                if (err) {
-                    return done(err, false)
-                }
-                // Success. Pass back savedUser
-                return done(null, savedUser);
+                    //Success. Pass back savedUser
+                    return done(null, savedUser);
+                })
+            }).catch(error=>{
+                console.log('no vlan found')
             })
+            // otherwise store user info in the Database
+           
         }).catch(function(err) {done(err, false)});
     }));
 

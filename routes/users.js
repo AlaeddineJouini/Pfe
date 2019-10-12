@@ -7,7 +7,21 @@ const Ips= require("../models/ips");
 /* GET users listing. */
 router.get('/getUsers', function (req, res, next) {
   User.find({role : "client",activation : true}).then(data=>{
-    res.render('allUsers',{users : data})
+    res.render('allUsers',{users : data,type : 'getUsers'})
+  }).catch(err=>{
+  console.log(err);
+  });
+});
+router.get('/getNotVerified', function (req, res, next) {
+  User.find({role : "client",verification : false}).then(data=>{
+    res.render('allUsers',{users : data ,type : 'getNotVerified'})
+  }).catch(err=>{
+  console.log(err);
+  });
+});
+router.get('/getNotActive', function (req, res, next) {
+  User.find({role : "client",activation : false,verification : true}).then(data=>{
+    res.render('allUsers',{users : data ,type : 'getNotActive'})
   }).catch(err=>{
   console.log(err);
   });
@@ -25,6 +39,36 @@ router.get('/removeUser/:id', function (req, res, next) {
 } else {
   res.sendStatus(403) // Forbidden
  }
+});
+router.post('/searchUser', function (req, res, next) {
+  var checked;
+  var verif = true;
+  var activ=false;
+  if(req.body.type =='getUsers'){
+    activ=true;
+  }else if(req.body.type == 'getNotVerified'){
+    verif=false
+  }
+  if (isNaN(Number(req.body.sr))){
+    checked=null
+  }
+  else {
+    checked=Number(req.body.sr)
+  }
+ 
+  User.find({
+  role : 'client',
+  activation : activ,
+  verification : verif,
+  $or : [{email: {$regex:'.*' + req.body.sr + '.*', $options: 'i'}} ,{vlan: checked} ]
+    }).then(data=>{
+      console.log('hhhhhhhhhhh');
+    res.send({data})
+  }).catch(err=>{
+    console.log('hhhhhhhhhh2222');
+    res.setHeader('Status', 500)
+    res.json(err);
+  });
 });
 
 router.get('/updateUser/:id', (req, res, next) => {
@@ -44,6 +88,28 @@ router.get('/updateUser/:id', (req, res, next) => {
  }
 
 })
+
+
+
+
+router.get('/activateUser/:id',(req,res,next)=>{
+  if (req.isAuthenticated() && req.user.isAdmin()){
+    let Object ={
+      activation : true
+    }
+    User.updateOne({_id : req.params.id},Object,(err)=>{
+      if(err)
+      console.log(err)
+
+    })
+    res.redirect('/users/getNotActive');
+  }
+  else {
+    res.sendStatus(403) // Forbidden
+   }
+})
+
+
 router.post('/updateUser/:id', (req, res, next) => {
   if (req.isAuthenticated() && req.user.isAdmin()){
     console.log(req.body.selectListDC)
@@ -77,24 +143,54 @@ router.post('/updateUser/:id', (req, res, next) => {
     }
     
 }
-
-
-  let Object = {
-      'cloud': req.body.selectListDC,
-      'cluster': req.body.Cluster,
-      'ds': sp[0],
-      'dc': req.body.DCenter,
-      'dn': req.body.dn,
-      'gw': req.body.gw,
-      'dns': req.body.dns,
-  };
-  User.updateOne({ _id: req.params.id }, Object, (err) => {
+  User.findById(req.params.id).then(resultat=>{
+    if(resultat.verification){
+      let Object = {
+        'cloud': req.body.selectListDC,
+        'cluster': req.body.Cluster,
+        'ds': sp[0],
+        'dc': req.body.DCenter,
+        'dn': req.body.dn,
+        'gw': req.body.gw,
+        'dns': req.body.dns,
+    };
+    
+    User.updateOne({ _id: req.params.id }, Object, (err) => {
       console.log(err);
   })
   User.updateOne({ _id: req.params.id },{ $push: { iprange: { $each: listIp } } }, (err) => {
     console.log(err);
-})
-  res.redirect('/users/getUsers');
+     res.redirect('/users/getUsers');
+  
+  })
+
+    }else{
+      let Object = {
+        'cloud': req.body.selectListDC,
+        'cluster': req.body.Cluster,
+        'ds': sp[0],
+        'dc': req.body.DCenter,
+        'dn': req.body.dn,
+        'gw': req.body.gw,
+        'dns': req.body.dns,
+        'verification' : true
+    };
+
+    User.updateOne({ _id: req.params.id }, Object, (err) => {
+      console.log(err);
+  })
+  User.updateOne({ _id: req.params.id },{ $push: { iprange: { $each: listIp } } }, (err) => {
+    console.log(err);
+    res.redirect('/users/getNotVerified');
+  })
+    }
+ 
+  }).catch(e=>{
+    console.log(e)
+  });
+
+ 
+  
 } else {
   res.sendStatus(403) // Forbidden
  }

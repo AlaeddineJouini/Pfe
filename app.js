@@ -38,6 +38,9 @@ mongo.on('open', () => {
 //jquery use
 app.use('/js', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bs', express.static(__dirname + '/node_modules/bootstrap'));
+app.use('/chartjs', express.static(__dirname + '/node_modules/chart.js'));
+app.use('/easyPieChart', express.static(__dirname + '/node_modules/easy-pie-chart'));
+app.use('/countup', express.static(__dirname + '/node_modules/countup/dist'));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'twig');
@@ -64,7 +67,7 @@ app.use(session({
   cookie: {
     secure: false,  
     httpOnly: false, // if true, will disallow JavaScript from reading cookie data
-    expires: new Date(Date.now() + 60 * 60 * 1000) // 1 hour;
+    expires: new Date(Date.now() + 60 * 60 * 24 * 1000) // 1 hour;
   }
 }))
 // Passport Config

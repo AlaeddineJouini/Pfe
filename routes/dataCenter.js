@@ -1,3 +1,12 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+const node_powershell_1 = __importDefault(require("node-powershell"));
+
 var express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose');
@@ -5,6 +14,9 @@ const dc = require('../models/Cloud');
 const cluster = require('../models/cluster');
 const ds = require('../models/dataStorage');
 const parser = require('body-parser');
+const run_1 = require("../dist/lib/run");
+const cpts_1 = require("../dist/ComputeNode");
+const c = require('../models/Cloud');
 
 
 /* GET home page. */
@@ -99,6 +111,52 @@ router.post('/updateDc/:id', (req, res, next) => {
         console.log(err);
     })
     res.redirect('/dataCenter/listDc');
+} else {
+    res.sendStatus(403) // Forbidden
+   }
+})
+
+router.get('/details/:id', (req, res, next) => {
+    if (req.isAuthenticated() && req.user.isAdmin()){
+        c.findById(req.params.id).then(async (data)=>{
+            
+            let URL = data.adress;
+            let username = data.user ;
+            let password = data.password;
+            const port = 443;
+            
+                /////
+                const ps = new node_powershell_1.default({
+                    executionPolicy: 'Bypass',
+                    noProfile: true,
+                });
+                console.log('Disabling SSL Cert Test');
+                const disableAuth = await run_1.run(ps, 'Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false');
+                console.log(`Disabling Auth Done: ${disableAuth}`);
+                console.log('Login into vCenter');
+                const test = await run_1.run(ps, `Connect-VIServer -Server ${URL} -Port ${port}  -Protocol https -Username ${username} -Password ${password}`);
+                console.log(test);
+                const cpt = await cpts_1.getComputes(ps);
+                //console.log(cpt);
+                const countVM = async (ps,hostName) => {
+                    const res = await run_1.run(ps, `(Get-VM -Location "${hostName}").count`);
+                    return JSON.parse(res);
+                };
+                //adding count to cpt result
+                let indx =0;
+                for (var cp of cpt){
+                    cpt[indx].VmNumber =await countVM(ps,cp.Name);
+                    indx++;
+                }
+               console.log(cpt)
+                ps.dispose();
+                res.render('cloudComputes',{cpt});
+                      
+             
+          }).catch((err)=>{
+              res.setHeader('Status', 500)
+              res.json(err);
+          })
 } else {
     res.sendStatus(403) // Forbidden
    }

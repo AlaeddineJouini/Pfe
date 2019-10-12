@@ -20,7 +20,7 @@ const userSchema = new Schema({
     dns: {type: String,default :null},
     dn: {type: String,default :null},
     iprange: [{type: mongoose.Schema.Types.ObjectId, ref: 'ips', default : []}],
-    vlan: {type: String,default :null},
+    vlan: {type: Number,default :null},
 
    
 }, { timestamps: true });
