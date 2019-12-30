@@ -5,13 +5,46 @@ const Cloud = require('../models/Cloud');
 const Ips= require("../models/ips");
 
 /* GET users listing. */
+// router.get('/getUsers', function (req, res, next) {
+//   User.find({role : "client",activation : true}).then(data=>{
+//     res.render('template/users',{users : data,type : 'getUsers'})
+//   }).catch(err=>{
+//   console.log(err);
+//   });
+// });
+
+/* GET users listing. */
 router.get('/getUsers', function (req, res, next) {
-  User.find({role : "client",activation : true}).then(data=>{
-    res.render('allUsers',{users : data,type : 'getUsers'})
+  if(req.query.filter != undefined){
+    var filters = req.query.filter.split(',');
+  
+    if(filters.length == 0){
+      var queries = {};
+    }else{
+      var filtersList = [];
+    if(filters.includes('ongoing')){
+      filtersList.push({activation : true});
+    }if(filters.includes('valid')){
+      filtersList.push({$and : [{verification : true , activation:false}]});
+    }if(filters.includes('new')){
+      filtersList.push({$and : [{verification : false , activation:false}]});
+    }
+    // var queries = {$or:filtersList};
+  }
+  
+  var query = {role : "client",$or:filtersList};
+}else{
+  var query = {role:"client"};
+}
+  console.log(queries);
+  User.find(query).then(data=>{
+
+    res.render('template/users',{users : data,type : 'getUsers'});
   }).catch(err=>{
   console.log(err);
   });
 });
+
 router.get('/getNotVerified', function (req, res, next) {
   User.find({role : "client",verification : false}).then(data=>{
     res.render('allUsers',{users : data ,type : 'getNotVerified'})
@@ -75,7 +108,7 @@ router.get('/updateUser/:id', (req, res, next) => {
   if (req.isAuthenticated() && req.user.isAdmin()){
     User.findById(req.params.id).then((data) => {
       Cloud.find({}).then(doc=>{
-        res.render('updateUser', { user: data,c:doc });
+        res.render('template/updateUser', { user: data,c:doc });
       }).catch(err=>{
         console.log(err);
       })
@@ -102,7 +135,7 @@ router.get('/activateUser/:id',(req,res,next)=>{
       console.log(err)
 
     })
-    res.redirect('/users/getNotActive');
+    res.redirect('/users/getUsers');
   }
   else {
     res.sendStatus(403) // Forbidden
@@ -181,7 +214,7 @@ router.post('/updateUser/:id', (req, res, next) => {
   })
   User.updateOne({ _id: req.params.id },{ $push: { iprange: { $each: listIp } } }, (err) => {
     console.log(err);
-    res.redirect('/users/getNotVerified');
+    res.redirect('/users/getUsers');
   })
     }
  
@@ -223,4 +256,31 @@ function conv(a){
 return ip;
 }
 //console.log(conv(a))
+
+
+
+router.get('/editProfile',(req,res)=>{
+  User.findById(req.user._id).then(doc=>{
+    res.send({doc})
+  }).catch(err=>{
+    console.log(err)
+  })
+  
+})
+
+router.post('/editProfile',(req,res)=>{
+  let Object ={
+    "email": req.body.email,
+    "password": User.generateHash(req.body.password),
+    "firstName":req.body.firstName,
+    "lastName": req.body.lastName,
+  }
+  User.updateOne({_id :req.user._id},Object,err=>{
+    if(err) console.log(err)
+   
+  })
+  res.send('updated')
+
+})
+
 module.exports = router;

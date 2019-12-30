@@ -3,7 +3,7 @@ const passport = require('passport');
 
 //  Signup ====================================================================
 router.get('/signup', function(req, res) {
-	res.render('signup');
+	res.render('template/register');
 });
 
 router.post('/signup', passport.authenticate('local-signup', {
@@ -26,7 +26,7 @@ router.get('/login', function(req, res, next)  {
             res.redirect('/vm/addVm')
         }
 	} else {
-		res.render('login')
+		res.render('template/login')
 	}
 })
 

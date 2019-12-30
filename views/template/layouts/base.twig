@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="stylesheet" href="/stylesheets/style.css">
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block sidebar %}{% endblock %}
+        <div class="main-content">
+        {% block body %}{% endblock %}
+        </div>
+        {% block javascripts %}{% endblock %}
+        <script>
+
+            $(document).ready(function() {
+                var url =window.location.pathname;
+                $('.navbar-nav a[href="' + url + '"]').addClass('active');
+            });
+        </script>
+    </body>
+</html>

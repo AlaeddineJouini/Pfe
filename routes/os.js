@@ -27,13 +27,12 @@ router.post('/addOsType', function (req, res, next) {
 } else {
     res.sendStatus(403) // Forbidden
    }
-
-
 });
+
 router.get('/listOs', function (req, res, next) {
     if (req.isAuthenticated() && req.user.isAdmin()){
     osType.find({}).then((data) => {
-        res.render('listOs', { osType: data });
+        res.render('template/os', { items: data });
     }).catch((err) => {
         res.setHeader('Status', 500)
         res.json(err);
@@ -51,7 +50,7 @@ router.get('/osDetails/:id', async function (req, res, next) {
         osNames = data;
     }));
     console.log(osNames);
-    res.render('osDetails', { osNames, id });
+    res.render('template/ostypes', { types:osNames, id });
 } else {
     res.sendStatus(403) // Forbidden
    }

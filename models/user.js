@@ -8,13 +8,14 @@ const userSchema = new Schema({
     email: { type: String },
     password: String,
     firstName: {type: String},
-    lasttName: {type: String},
+    lastName: {type: String},
     role: {type: String, default: "client"},
     activation: {type: Boolean, default: false},
     verification: {type: Boolean, default: false},
     cloud: {type: String,default :null},
     dc: {type: String,default :null},
     cluster: {type: String,default :null},
+    cidr : {type: String , default :"24"},
     ds: {type: String,default :null},
     gw: {type: String,default :null},
     dns: {type: String,default :null},
@@ -50,6 +51,9 @@ userSchema.methods.isClient = function() {
 };
 userSchema.methods.isVerified = function() {
     return (this.verification );
+};
+userSchema.methods.isActivated = function() {
+    return (this.activation );
 };
 userSchema.methods.isAdmin = function() {
     return (this.role === "admin");

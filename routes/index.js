@@ -5,17 +5,25 @@ const dc = require('../models/Cloud');
 const parser = require('body-parser');
 const User = require('../models/user')
 
+
+/* GET form page */
+router.get('/form',function(req,res,next) {
+  res.render('template/forms');
+});
+
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
   if (req.isAuthenticated() && req.user.isAdmin()) {
     dc.find({}).then((data) => {
-      res.render('listDc', { dc: data });
+      res.render('template/dashboard', { dc: data });
     }).catch((err) => {
       res.setHeader('Status', 500)
       res.json(err);
     })
 } else {
-    res.sendStatus(403) // Forbidden
+    // res.sendStatus(403) // Forbidden
+    res.redirect("/auth/login")
 }
 
 });

@@ -1,0 +1,252 @@
+{% extends "./layouts/base.twig" %}
+{% use "./layouts/sidebar.twig" %}
+
+
+{# Title for this page #}
+{% block title %}Admins
+{% endblock %}
+
+{# Define the stylesheets #}
+{% block stylesheets %}
+
+	<!-- Resources -->
+	
+	<link
+	href="/images/brand/favicon.png" rel="icon" type="image/png">
+	<!-- Fonts -->
+	<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+	<!-- Icons -->
+	<link href="/javascripts/plugins/nucleo/css/nucleo.css" rel="stylesheet"/>
+	<link
+	href="/javascripts/plugins/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet"/>
+	<!-- CSS Files -->
+	<link
+	href="/css/argon-dashboard.css?v=1.1.0" rel="stylesheet"/>
+	<!-- Styles -->
+	<style>
+		div[id^="donut"] {
+			width: 100%;
+			height: 500px;
+		}
+	</style>
+{% endblock %}
+
+{% block sidebar %}
+	{% include "./layouts/sidebar.twig" %}
+{% endblock %}
+
+{# Body of this page #}
+{% block body %}
+
+	{% block navbar %}
+
+		{% include "./layouts/navbar.twig" with {
+        'picture':"/images/theme/team-4-800x800.jpg",
+        'name':"Jessica Alba",
+    } %}
+
+	{% endblock %}
+	{% block background %}
+
+		<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+			<div class="container-fluid">
+				<div class="header-body"></div>
+			</div>
+		</div>
+
+	{% endblock %}
+
+	<div class="container-fluid mt--7">
+        {% for cp in cpt %}
+        {% set foo = 1 %}
+		    <div class="row" style="flex-wrap:unset">
+                <div class="card bg-secondary shadow col-md-4">
+                    <div class="card-body">
+                        <div><span style="font-size: 40px;">
+                            {% if cp.Name|length > 20 %}
+                            {{cp.Name|slice(0, 20)}}...
+                            {% else %}
+                            {{cp.Name}}
+                            {% endif %}
+                        </span></div>
+                        <div><span style="font-size: 30px;">number of VMs : {{cp.VmNumber}}</span></div>
+   
+                    </div>
+                </div>
+				<div class="card bg-secondary shadow col-md-4">
+                    <div class="card-body">
+                        <div  class="chart" data-percent="{{(cp.CpuUsageMhz * 100 / cp.CpuTotalMhz) | number_format(1, '.', ',') }}"><span class="sp" id="{{cp.Name ~ foo}}" > </span> <span class="sp2">%</span> </div>
+                        <div>CPU Usage</div>
+                    </div>
+                </div>
+                {% set foo = foo + 1 %}
+                <div class="card bg-secondary shadow col-md-4">
+                    <div class="card-body">
+                        <div  class="chart" data-percent="{{(cp.MemoryUsageGB * 100 / cp.MemoryTotalGB) | number_format(1, '.', ',') }}"><span class ="sp" id="{{cp.Name ~ foo}}" > </span> <span class="sp2">%</span> </div>
+                        <div>Memory Usage</div>
+   
+                    </div>
+                </div>
+            </div>
+       
+        {% endfor %}
+    </div>
+    <div id="chartdiv"></div>
+<!--
+<br>
+<div>
+<div class="ct1">
+        
+    <div>exi1</div>
+    {% set too = 1 %}
+    {% for cp in cpt %}
+     
+    <div class="box">
+        <div class="chart" data-percent="{{(cp.MemoryUsageGB * 100 / cp.MemoryTotalGB) | number_format(1, '.', ',') }}"><span id="{{cp.Name ~ too}}">{{(cp.MemoryUsageGB * 100 / cp.MemoryTotalGB) | number_format(1, '.', ',') }} %</span></div>
+        <h4>{{cp.Name | slice(0, 6)}}</h4>
+    </div>
+    {% set too = foo + 1 %}
+    {% endfor %}
+</div>
+</div>
+-->
+
+
+<!--<canvas id="myChart" width="400" height="400"></canvas>-->
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="/easyPieChart/dist/jquery.easypiechart.js"></script>
+<script src="/bs/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/countup/countUp.js"></script>
+<script src="//www.amcharts.com/lib/4/core.js"></script>
+<script src="//www.amcharts.com/lib/4/charts.js"></script>
+<script src="//www.amcharts.com/lib/4/themes/animated.js"></script>
+<script src="//www.amcharts.com/lib/4/themes/kelly.js"></script>
+
+<script>
+       
+$(function(){
+    $('.chart').easyPieChart({
+        size : 300,
+        barColor : '#17d3e6',
+        scaleColor : false,
+        lineWidth : 30,
+        trackColor :'#373737',
+        animate : 4000
+    });
+});
+
+
+</script>
+<script>
+       console.log({{cpt | json_encode}});
+       for(x of {{cpt | json_encode}}){
+            console.log(x.Name)
+            var c =new CountUp(''+x.Name+'1',0,x.CpuUsageMhz * 100 / x.CpuTotalMhz,1,4);
+            var c2 =new CountUp(''+x.Name+'2',0,x.MemoryUsageGB * 100 / x.MemoryTotalGB,1,4);
+            c.start();
+            c2.start();
+       }
+</script>
+<script>
+    // Apply chart themes
+am4core.useTheme(am4themes_animated);
+am4core.useTheme(am4themes_kelly);
+
+// Create chart instance
+var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+// Add data
+chart.data={{dStore |json_encode}};
+/*
+chart.data = [{
+  "country": "Lithuania",
+  "research": 501.9,
+  "marketing": 250,
+  "sales": 199
+}, {
+  "country": "Czech Republic",
+  "research": 301.9,
+  "marketing": 222,
+  "sales": 251
+}, {
+  "country": "Ireland",
+  "research": 201.1,
+  "marketing": 170,
+  "sales": 199
+}, {
+  "country": "Germany",
+  "research": 165.8,
+  "marketing": 122,
+  "sales": 90
+}, {
+  "country": "Australia",
+  "research": 139.9,
+  "marketing": 99,
+  "sales": 252
+}, {
+  "country": "Austria",
+  "research": 128.3,
+  "marketing": 85,
+  "sales": 84
+}, {
+  "country": "UK",
+  "research": 99,
+  "marketing": 93,
+  "sales": 142
+}, {
+  "country": "Belgium",
+  "research": 60,
+  "marketing": 50,
+  "sales": 55
+}, {
+  "country": "The Netherlands",
+  "research": 50,
+  "marketing": 42,
+  "sales": 25
+}];*/
+
+// Create axes
+var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "Name";
+categoryAxis.title.text = "DataStores";
+categoryAxis.renderer.grid.template.location = 0;
+categoryAxis.renderer.minGridDistance = 20;
+
+var  valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+valueAxis.title.text = "SpaceGB ";
+
+// Create series
+var series = chart.series.push(new am4charts.ColumnSeries());
+series.dataFields.valueY = "CapacityGB";
+series.dataFields.categoryX = "Name";
+series.name = "CapacityGB";
+series.tooltipText = "{name}: [bold]{valueY}[/]";
+// This has no effect
+// series.stacked = true;
+
+var series2 = chart.series.push(new am4charts.ColumnSeries());
+series2.dataFields.valueY = "Used";
+series2.dataFields.categoryX = "Name";
+series2.name = "Used";
+series2.tooltipText = "{name}: [bold]{valueY}[/]";
+// Do not try to stack on top of previous series
+// series2.stacked = true;
+
+var series3 = chart.series.push(new am4charts.ColumnSeries());
+series3.dataFields.valueY = "FreeSpaceGB";
+series3.dataFields.categoryX = "Name";
+series3.name = "FreeSpaceGB";
+series3.tooltipText = "{name}: [bold]{valueY}[/]";
+series3.stacked = true;
+
+// Add cursor
+chart.cursor = new am4charts.XYCursor();
+
+// Add legend
+chart.legend = new am4charts.Legend();
+</script>
+{% endblock %}

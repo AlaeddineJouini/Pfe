@@ -5,9 +5,9 @@ const VmsSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    dc: {
+    cloud: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'dataCenter'
+        ref: 'Cloud'
     },
     cpus: {
         type: Number,
@@ -16,6 +16,10 @@ const VmsSchema = mongoose.Schema({
     cluster:{
         type: String,
         required : true
+    },
+    dc:{
+        type:String,
+        required:true,
     },
     ds:{
         type: String,

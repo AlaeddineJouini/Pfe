@@ -22,6 +22,7 @@ var testRouter = require('./routes/test');
 var clientRouter = require('./routes/client');
 var vmRouter = require('./routes/vms');
 var dcDetails =require('./dist/index');
+var adminsRoute =require('./routes/admins');
 
 var app = express();
 
@@ -49,7 +50,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(session({
   name: 'sessionId',
@@ -97,6 +98,7 @@ app.use('/client',clientRouter);
 app.use('/auth',require('./routes/auth'))
 app.use('/vm',vmRouter);
 app.use('/realTime',dcDetails);
+app.use('/admin',adminsRoute);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

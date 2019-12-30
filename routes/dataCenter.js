@@ -17,13 +17,14 @@ const parser = require('body-parser');
 const run_1 = require("../dist/lib/run");
 const cpts_1 = require("../dist/ComputeNode");
 const c = require('../models/Cloud');
+const ds_1 = require('../dist/Datastores')
 
 
 /* GET home page. */
 router.get('/listDc', function (req, res, next) {
     if (req.isAuthenticated() && req.user.isAdmin()){
     dc.find({}).then((data) => {
-        res.render('listDc', { dc: data });
+        res.render('template/dataCenter', { clouds: data });
     }).catch((err) => {
         res.setHeader('Status', 500)
         res.json(err);
@@ -48,10 +49,6 @@ router.post('/addDc', function (req, res, next) {
         "password": req.body.password
     };
     dc.create(Object);
-    console.log(req.body.name)
-    console.log(req.body.adress)
-    console.log(req.body.user)
-    console.log(req.body.password),
 
     res.redirect('/dataCenter/listDc');
 } else {
@@ -120,7 +117,7 @@ router.get('/details/:id', (req, res, next) => {
     if (req.isAuthenticated() && req.user.isAdmin()){
         c.findById(req.params.id).then(async (data)=>{
             
-            let URL = data.adress;
+          let URL = data.adress;
             let username = data.user ;
             let password = data.password;
             const port = 443;
@@ -137,11 +134,19 @@ router.get('/details/:id', (req, res, next) => {
                 const test = await run_1.run(ps, `Connect-VIServer -Server ${URL} -Port ${port}  -Protocol https -Username ${username} -Password ${password}`);
                 console.log(test);
                 const cpt = await cpts_1.getComputes(ps);
+                const dStore = await ds_1.getDatastores(ps);
                 //console.log(cpt);
                 const countVM = async (ps,hostName) => {
                     const res = await run_1.run(ps, `(Get-VM -Location "${hostName}").count`);
                     return JSON.parse(res);
                 };
+
+                let dss=[]
+                let counter = 0
+                for (var d of dStore){
+                    dStore[counter].Used = d.CapacityGB-d.FreeSpaceGB;
+                    counter++;
+                }
                 //adding count to cpt result
                 let indx =0;
                 for (var cp of cpt){
@@ -149,10 +154,37 @@ router.get('/details/:id', (req, res, next) => {
                     indx++;
                 }
                console.log(cpt)
+               console.log(dStore)
                 ps.dispose();
-                res.render('cloudComputes',{cpt});
-                      
+                res.render('template/cloudComputes',{cpt,dStore});
+              /*  const cpt =[{
+                    'Name' : 'esx1',
+                    'NumCpu' : 5,
+                    'CpuUsageMhz' : 20 ,
+                    'CpuTotalMhz' : 30,
+                    'MemoryUsageGB': 30,
+                    'MemoryTotalGB' : 100
+                },
+                {
+                    'Name' : 'esx2',
+                    'NumCpu' : 6,
+                    'CpuUsageMhz' : 22 ,
+                    'CpuTotalMhz' : 30,
+                    'MemoryUsageGB': 40,
+                    'MemoryTotalGB' : 100
+                },
+                {
+                    'Name' : 'esx3',
+                    'NumCpu' : 4,
+                    'CpuUsageMhz' : 25 ,
+                    'CpuTotalMhz' : 30,
+                    'MemoryUsageGB': 50,
+                    'MemoryTotalGB' : 100
+                }
+            ]
+                 res.render('template/cloudComputes',{cpt})    
              
+                 */
           }).catch((err)=>{
               res.setHeader('Status', 500)
               res.json(err);

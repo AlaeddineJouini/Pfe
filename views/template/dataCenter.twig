@@ -1,0 +1,323 @@
+{% extends "./layouts/base.twig" %}
+{% use "./layouts/sidebar.twig" %}
+
+
+{# Title for this page #}
+{% block title %}Hello
+{% endblock %}
+
+{# Define the stylesheets #}
+{% block stylesheets %}
+	<link
+	href="/images/brand/favicon.png" rel="icon" type="image/png">
+	<!-- Fonts -->
+	<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+	<!-- Icons -->
+	<link href="/javascripts/plugins/nucleo/css/nucleo.css" rel="stylesheet"/>
+	<link
+	href="/javascripts/plugins/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet"/>
+	<!-- CSS Files -->
+	<link href="/css/argon-dashboard.css?v=1.1.0" rel="stylesheet"/>
+{% endblock %}
+
+{% block sidebar %}
+	{% include "./layouts/sidebar.twig" %}
+{% endblock %}
+
+{# Body of this page #}
+{% block body %}
+
+	{% block navbar %}
+
+		{% include "./layouts/navbar.twig" with {
+        'picture':"/images/theme/team-4-800x800.jpg",
+        'name':"Jessica Alba",
+    } %}
+
+	{% endblock %}
+	{% block background %}
+
+		<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+			<div class="container-fluid">
+				<div class="header-body"></div>
+			</div>
+		</div>
+
+	{% endblock %}
+
+	{# Body #}
+
+	<div class="container-fluid mt--7">
+		<div class="card bg-secondary shadow">
+			<div class="card-header bg-white border-0">
+				<div class="row align-items-center">
+					<div class="col-8">
+						<h3 class="mb-0">Clouds</h3>
+					</div>
+					<div class="col-md-4">
+							<button type="button" class="btn btn-md btn-default" style="float:right;" data-toggle="modal" data-target="#modal-form">Add Cloud</button>
+							<div class="modal fade" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="modal-form" aria-hidden="true">
+								<div class="modal-dialog modal- modal-dialog-centered modal-sm" role="document">
+									<div class="modal-content">
+	
+										<div class="modal-body p-0">
+	
+	
+											<div class="card bg-secondary shadow border-0">
+												<div class="card-header bg-transparent">
+													<div class="text-muted text-center mt-2 mb-3">
+														<strong>Add Cloud</strong>
+													</div>
+												</div>
+												<div class="card-body px-lg-5 py-lg-5">
+													<form role="form" method="POST" action="/datacenter/addDC">
+														<div class="form-group mb-3">
+															<div class="input-group input-group-alternative">
+																<div class="input-group-prepend">
+																	<span class="input-group-text">
+																		<i class="ni ni-email-83"></i>
+																	</span>
+																</div>
+																<input class="form-control" name="name" placeholder="name" type="text">
+															</div>
+														</div>
+	
+														<div class="form-group mb-3">
+															<div class="input-group input-group-alternative">
+																<div class="input-group-prepend">
+																	<span class="input-group-text">
+																		<i class="ni ni-books"></i>
+																	</span>
+																</div>
+																<input class="form-control" name="adress" placeholder="adress" type="text">
+															</div>
+														</div>
+														<div class="form-group mb-3">
+															<div class="input-group input-group-alternative">
+																<div class="input-group-prepend">
+																	<span class="input-group-text">
+																		<i class="ni ni-email-83"></i>
+																	</span>
+																</div>
+																<input class="form-control" name="user" placeholder="user" type="text">
+															</div>
+														</div>
+														<div class="form-group mb-3">
+															<div class="input-group input-group-alternative">
+																<div class="input-group-prepend">
+																	<span class="input-group-text">
+																		<i class="ni ni-lock-circle-open"></i>
+																	</span>
+																</div>
+																<input class="form-control" name="password" placeholder="Password" type="password">
+															</div>
+														</div>
+														<div class="text-center">
+															<button type="submit" class="btn btn-primary my-4">Add</button>
+														</div>
+													</form>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+			<div class="card-body">
+
+				<div class="table-responsive">
+					<div>
+						<table class="table align-items-center">
+							<thead class="thead-light">
+								<tr>
+									<th scope="col">
+										Name
+									</th>
+									<th scope="col">
+										Adress
+									</th>
+									<th scope="col">
+										User
+									</th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody class="list">
+
+
+								{% for data in clouds %}
+
+
+									<tr>
+										<th scope="row" class="name">
+											<div class="media align-items-center">
+												<div class="media-body">
+													<span class="mb-0 text-sm">{{data.name}}
+													</span>
+												</div>
+											</div>
+										</th>
+										<td>
+											<div class="media align-items-center">
+												<div class="media-body">
+													<span class="mb-0 text-sm">{{data.adress}}
+													</span>
+												</div>
+											</div>
+										</td>
+										<td class="status">
+											<div class="media align-items-center">
+												<div class="media-body">
+													<span class="mb-0 text-sm">
+														{{data.user}}</span>
+												</div>
+											</div>
+										</td>
+										<td class="text-right">
+											<div class="dropdown">
+												<a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+													<i class="fas fa-ellipsis-v"></i>
+												</a>
+												<div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+													<a class="dropdown-item" href="removeDc/{{data.id}}">Delete</a>
+													<a class="dropdown-item" href="details/{{data.id}}">Stats</a>
+													<a class="dropdown-item" href="#" data-toggle="modal" data-target="#modal-form{{data._id}}">Update</a>
+
+
+												</div>
+											</div>
+											<div class="modal fade" id="modal-form{{data._id}}" tabindex="-1" role="dialog" aria-labelledby="modal-form{{data._id}}" aria-hidden="true">
+												<div class="modal-dialog modal- modal-dialog-centered modal-sm" role="document">
+													<div class="modal-content">
+
+														<div class="modal-body p-0">
+
+
+															<div class="card bg-secondary shadow border-0">
+																<div class="card-header bg-transparent">
+																	<div class="text-muted text-center mt-2 mb-3">
+																		<strong>Update Cloud</strong>
+																	</div>
+																</div>
+																<div class="card-body px-lg-5 py-lg-5">
+																	<form role="form" method="POST" action="updateDc/{{data.id}}">
+																		<div class="form-group mb-3">
+																				<div class="input-group input-group-alternative">
+																					<div class="input-group-prepend">
+																						<span class="input-group-text">
+																							<i class="ni ni-email-83"></i>
+																						</span>
+																					</div>
+																					<input class="form-control" value="{{data.name}}" name="name" placeholder="name" type="text">
+																				</div>
+																			</div>
+						
+																			<div class="form-group mb-3">
+																				<div class="input-group input-group-alternative">
+																					<div class="input-group-prepend">
+																						<span class="input-group-text">
+																							<i class="ni ni-books"></i>
+																						</span>
+																					</div>
+																					<input class="form-control" name="adress" value="{{data.adress}}" placeholder="adress" type="text">
+																				</div>
+																			</div>
+																			<div class="form-group mb-3">
+																				<div class="input-group input-group-alternative">
+																					<div class="input-group-prepend">
+																						<span class="input-group-text">
+																							<i class="ni ni-email-83"></i>
+																						</span>
+																					</div>
+																					<input class="form-control" value="{{data.user}}" name="user" placeholder="user" type="text">
+																				</div>
+																			</div>
+																			<div class="form-group mb-3">
+																				<div class="input-group input-group-alternative">
+																					<div class="input-group-prepend">
+																						<span class="input-group-text">
+																							<i class="ni ni-lock-circle-open"></i>
+																						</span>
+																					</div>
+																					<input class="form-control" value="{{data.password}}" name="password" placeholder="Password" type="password">
+																				</div>
+																			</div>
+																		<div class="text-center">
+																			<button type="submit" class="btn btn-primary my-4">Update</button>
+																		</div>
+																	</form>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								{% endfor %}
+
+							</tbody>
+
+							<tfoot>
+								{% if nbPages > 1 %}
+
+									<tr>
+										<td colspan="10">
+											<nav aria-label="Page navigation example">
+												<ul class="pagination justify-content-center">
+													<li class="page-item {% if currentPage == 1 %}disabled{% endif %}">
+														<a class="page-link" onclick="goToPage(-1)" tabindex="-1">
+															<i class="fa fa-angle-left"></i>
+															<span class="sr-only">Previous</span>
+														</a>
+													</li>
+													{% for i in 1..nbPages %}
+														<li class="page-item {% if currentPage == i %} active {% endif %}">
+															<a class="page-link" onclick="goToPage({{ i - currentPage }})">{{i}}</a>
+														</li>
+													{% endfor %}
+													<li class="page-item {% if currentPage == nbPages %} disabled {% endif %}">
+														<a class="page-link" onclick="goToPage(1)">
+															<i class="fa fa-angle-right"></i>
+															<span class="sr-only">Next</span>
+														</a>
+													</li>
+												</ul>
+											</nav>
+										</td>
+									</tr>
+								{% endif %}
+
+							</tfoot>
+						</table>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+	<!--   Core   -->
+	<script src="/javascripts/plugins/jquery/dist/jquery.min.js"></script>
+	<script src="/javascripts/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<!--   Optional JS   -->
+	<!--   Argon JS   -->
+	<script src="/javascripts/argon-dashboard.min.js?v=1.1.0"></script>
+	<script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+	<script>
+		var urlParams = new URLSearchParams(window.location.search);
+
+
+function goToPage(step) {
+urlParams.set("currentPage", urlParams.get('currentPage') && (step > 0 || (urlParams.get('currentPage') > 1 && step < 0)) ? Number(urlParams.get('currentPage')) + step : 1);
+window.location.href = "/users?" + urlParams.toString();
+}
+	</script>
+{% endblock %}

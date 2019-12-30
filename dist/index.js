@@ -14,9 +14,9 @@ const Vlan_1= require("./Vlan")
 const run_1 = require("./lib/run");
 const VMs_1 = require("./VMs");
 const Cpts_1=require('./ComputeNode');
-const URL = '172.16.100.9';
-const username = 'test.pfe@vsphere.local';
-const password = 'PFE123**456';
+const URL = '10.100.100.100';
+const username = 'ala.jouini.pfe@eodatacenter.local';
+const password = 'Aladinnoway22*';
 const port = 443;
 const name = 'testFirst'
 const vs = 'vSwitch1'
@@ -54,8 +54,8 @@ const Start = async () => {
     console.log(test);
     //const r = await run_1.run(ps, `New-VirtualPortGroup -Name ${name} -VirtualSwitch ${vs} -VLanId ${vid} `);
     //const ds = await Datastores_1.getDatastores(ps);
-    const cpt=await Cpts_1.getComputes(ps);
-    console.log(cpt);
+   // const cpt=await Cpts_1.getComputes(ps);
+   // console.log(cpt);
    //console.log(r);
     //console.log(ds);
     //const vl = await Vlan_1.getVlan(ps);
@@ -64,6 +64,8 @@ const Start = async () => {
     //console.log(Cluster);
     //const DCs = await DataCenter_1.getDataCenters(ps);
     //console.log(DCs);
+    const vms = await VMs_1.getVMs(ps);
+    console.log(vms);
     ps.dispose();
 };
 //Start();
