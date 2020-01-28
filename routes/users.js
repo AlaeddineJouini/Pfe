@@ -60,7 +60,7 @@ router.get('/getNotActive', function (req, res, next) {
   });
 });
 router.get('/removeUser/:id', function (req, res, next) {
-  if (req.isAuthenticated() && req.user.isAdmin()){
+  if (req.isAuthenticated() && ((req.user.isAdmin())||req.user.isSuper())){
   User.deleteOne({ _id: req.params.id }).then(() => {
       
       console.log('success delete');
@@ -105,7 +105,7 @@ router.post('/searchUser', function (req, res, next) {
 });
 
 router.get('/updateUser/:id', (req, res, next) => {
-  if (req.isAuthenticated() && req.user.isAdmin()){
+  if (req.isAuthenticated() && ((req.user.isAdmin())||req.user.isSuper())){
     User.findById(req.params.id).then((data) => {
       Cloud.find({}).then(doc=>{
         res.render('template/updateUser', { user: data,c:doc });
@@ -126,7 +126,7 @@ router.get('/updateUser/:id', (req, res, next) => {
 
 
 router.get('/activateUser/:id',(req,res,next)=>{
-  if (req.isAuthenticated() && req.user.isAdmin()){
+  if (req.isAuthenticated() && ((req.user.isAdmin())||req.user.isSuper())){
     let Object ={
       activation : true
     }
@@ -144,7 +144,7 @@ router.get('/activateUser/:id',(req,res,next)=>{
 
 
 router.post('/updateUser/:id', (req, res, next) => {
-  if (req.isAuthenticated() && req.user.isAdmin()){
+  if (req.isAuthenticated() && ((req.user.isAdmin())||req.user.isSuper())){
     console.log(req.body.selectListDC)
     console.log(req.body.Cluster)
     console.log(req.body.DS)

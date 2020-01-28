@@ -21,7 +21,7 @@ router.get('/login', function(req, res, next)  {
         res.redirect('/')
         else{
 			if(!(req.user.isVerified())){
-				res.render('notVerified')
+				res.render('template/comingsoon')
 			}else
             res.redirect('/vm/addVm')
         }
@@ -38,7 +38,7 @@ router.post('/login', passport.authenticate('local-login', {
         res.redirect('/')
     else{
 		if(!(req.user.isVerified())){
-			res.render('notVerified')
+			res.render('template/comingsoon')
 		}else
         res.redirect('/vm/addVm')
     }

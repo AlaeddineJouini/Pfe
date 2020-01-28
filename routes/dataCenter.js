@@ -22,7 +22,7 @@ const ds_1 = require('../dist/Datastores')
 
 /* GET home page. */
 router.get('/listDc', function (req, res, next) {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+    if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
     dc.find({}).then((data) => {
         res.render('template/dataCenter', { clouds: data });
     }).catch((err) => {
@@ -41,7 +41,7 @@ router.get('/addDc', function (req, res, next) {
    }
 });
 router.post('/addDc', function (req, res, next) {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+    if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
     let Object = {
         "name": req.body.name,
         "adress": req.body.adress,
@@ -57,7 +57,7 @@ router.post('/addDc', function (req, res, next) {
 
 });
 router.get('/dcDetails/:id', async function (req, res, next) {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+    if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
     let clusters;
     let dss;
     let id = req.params.id;
@@ -69,7 +69,7 @@ router.get('/dcDetails/:id', async function (req, res, next) {
    }
 });
 router.get('/removeDc/:id', function (req, res, next) {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+    if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
     dc.deleteOne({ _id: req.params.id }).then(() => {
         
         res.redirect('/dataCenter/listDc');
@@ -84,7 +84,7 @@ router.get('/removeDc/:id', function (req, res, next) {
    }
 });
 router.get('/updateDc/:id', (req, res, next) => {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+    if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
     dc.findById(req.params.id).then((Object) => {
 
         console.log(Object.name);
@@ -97,7 +97,7 @@ router.get('/updateDc/:id', (req, res, next) => {
    }
 })
 router.post('/updateDc/:id', (req, res, next) => {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+    if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
     let Object = {
         "name": req.body.name,
         "adress": req.body.adress,
@@ -114,7 +114,7 @@ router.post('/updateDc/:id', (req, res, next) => {
 })
 
 router.get('/details/:id', (req, res, next) => {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+    if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
         c.findById(req.params.id).then(async (data)=>{
             
           let URL = data.adress;

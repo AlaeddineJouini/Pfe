@@ -58,8 +58,8 @@
     <label>Data Store</label>
      <select class="form-control"  id="DS" name="DS" {% if vm is defined %} readonly="readonly" {% endif %}
      >
-         {% if vm is defined %}
-         <option value="{{vm.ds}}">{{vm.ds}}</option>
+         {% if vm.ds != null %}
+         <option selected disabled value="{{vm.ds}}">{{vm.ds}}</option>
          {% endif %}
              
     </select>
@@ -246,75 +246,250 @@
      });
 
    // var cluster =document.getElementById("Cluster");
-    var dataStore = document.getElementById("DS");
-    var dcdiv =document.getElementById("DCdiv");
-    var DCenter = document.getElementById("DCenterDiv")
-    $('#selectListDC').change(function () {
-        //$('#Cluster').empty();
-        $('#DS').empty();
-        $.ajax({
-            type: "POST",
-            url: "http://localhost:3000/vm/getClDs",
-            data: { Dc: $(this).val()},
-            datatype: "json",
-            beforeSend: function(){
-                 while(dcdiv.firstChild){
-                    dcdiv.removeChild(dcdiv.firstChild);
-                 }
-                 
-                 $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )
-                $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCdiv" )
-            },
-            complete: function(){
-                
-            },
-            success: function (res) {
-                while(dcdiv.firstChild){
-                    dcdiv.removeChild(dcdiv.firstChild);
-                 }
-            $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )   
-            $( " <select   class='form-control' id='Cluster' name='Cluster'></select>" ).appendTo( "#DCdiv" )
-                //new added for test
-            var cluster =document.getElementById("Cluster");
-                console.log(res.cl)
-            if(isArray(res.cl)){
-                for(cl of res.cl){
-                console.log(cl.name)
-                var option=document.createElement("option");
-                option.text=cl.Name 
-                cluster.add(option)
+   var dsdiv =document.getElementById('DSdiv');
+        var dcdiv =document.getElementById("DCdiv");
+        var DCenterdiv = document.getElementById("DCenterDiv")
+        $('#selectListDC').change(function () {
+            //$('#Cluster').empty();
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:3000/vm/getClDs",
+                data: { Dc: $(this).val()},
+                datatype: "json",
+                beforeSend: function(){
+                     while(dcdiv.firstChild){
+                        dcdiv.removeChild(dcdiv.firstChild);
+                     }
+                     while(dsdiv.firstChild){
+                        dsdiv.removeChild(dsdiv.firstChild);
+                     }
+                     while(DCenterdiv.firstChild){
+                        DCenterdiv.removeChild(DCenterdiv.firstChild);
+                     }
+                     
+                     $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )
+                    $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCdiv" )
+                    $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+                    $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DSdiv" )
+                    $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+                    $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCenterDiv" )
+                },
+                complete: function(){
+                    
+                },
+                success: function (res) {
+                    while(dcdiv.firstChild){
+                        dcdiv.removeChild(dcdiv.firstChild);
+                     }
+                     while(dsdiv.firstChild){
+                        dsdiv.removeChild(dsdiv.firstChild);
+                     }
+                     while(DCenterdiv.firstChild){
+                        DCenterdiv.removeChild(DCenterdiv.firstChild);
+                     }
+                     
+                $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )   
+                $( " <select   class='form-control' id='Cluster' name='Cluster'></select>" ).appendTo( "#DCdiv" )
+                $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+                $( " <select   class='form-control' id='DS' name='DS'></select>" ).appendTo( "#DSdiv" )
+                $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+                $( " <select   class='form-control' id='DCenter' name='DCenter'></select>" ).appendTo( "#DCenterDiv" )
+                    //new added for test
+                var cluster =document.getElementById("Cluster");
+                var DCenter =document.getElementById("DCenter");
+                var dataStore = document.getElementById("DS");
+                    console.log(res.cl)
+                    /*var option=document.createElement("option");
+                    option.text="{{user.email}}"
+                    cluster.add(option)*/
+                if(isArray(res.cl)){
+                    for(cl of res.cl){
+                    console.log(cl.name)
+                    var option=document.createElement("option");
+                    option.text=cl.Name 
+                    if(cl.Name === "{{user.cluster}}"){
+                    option.selected =true;
+                    }
+                    cluster.add(option)
+                    }
+                }else{
+                    console.log(res.cl.name)
+                    var option=document.createElement("option");
+                    option.text=res.cl.Name 
+                    if(res.cl.Name === "{{user.cluster}}"){
+                    option.selected =true;
+                    }
+                    cluster.add(option)
                 }
-            }else{
-                console.log(res.cl.name)
-                var option=document.createElement("option");
-                option.text=res.cl.Name 
-                cluster.add(option)
-            }
-            if(isArray(res.dcenter)){
-                for(d of res.dcenter){
-                console.log(dcenter.name)
-                var option=document.createElement("option");
-                option.text=dcenter.Name 
-                Dcenter.add(option)
+                if(isArray(res.dcenter)){
+                    for(d of res.dcenter){
+                    console.log(d.name)
+                    var option=document.createElement("option");
+                    option.text=d.Name 
+                    if(d.Name === "{{user.dc}}"){
+                    option.selected =true;
+                    }
+                    DCenter.add(option)
+                    }
+                }else{
+                    console.log(res.dcenter.Name)
+                    var option=document.createElement("option");
+                    option.text=res.dcenter.Name 
+                    if(res.dcenter.Name === "{{user.dc}}"){
+                    option.selected =true;
+                    }
+                    DCenter.add(option)
                 }
-            }else{
-                console.log(res.dcenter.Name)
-                var option=document.createElement("option");
-                option.text=res.dcenter.Name 
-                Dcenter.add(option)
-            }
-            for (ds of res.ds){
-                console.log(ds.Name)
-                var option=document.createElement("option");
-                option.text=''+ds.Name+'| FreeSpace : '+ds.FreeSpaceGB/1024+'  TB'+'       TotalSpace : '+ds.CapacityGB/1024+'  TB'
-                dataStore.add(option)
-            }
-            }
+                for (ds of res.ds){
+                    console.log(ds.Name)
+                    var option=document.createElement("option");
+                    option.text=''+ds.Name+'|'+ds.FreeSpaceGB+' GB';
+                    if(ds.Name === "{{user.ds}}"){
+                    option.selected =true;
+                    datastore.readOnly= true;
+                    }
+                    dataStore.add(option)
+                }
+                }
+             });
          });
-     });
-
-
-    });
+    
+    
+        });
+        window.onload = function() {
+      
+    
+      isObject = function(a) {
+      return (!!a) && (a.constructor === Object);
+      };
+      isArray = function(a) {
+      return (!!a) && (a.constructor === Array);
+      };
+    $(document).ready(function () {
+     
+  
+     // var cluster =document.getElementById("Cluster");
+      
+      var dsdiv =document.getElementById('DSdiv');
+      var dcdiv =document.getElementById("DCdiv");
+      var DCenterdiv = document.getElementById("DCenterDiv");
+      var cloud =document.getElementById("selectListDC");
+          //$('#Cluster').empty();
+          console.log('hiiiiiiiii : '+ cloud.value)
+          $.ajax({
+              type: "POST",
+              url: "http://localhost:3000/vm/getClDs",
+              data: { Dc: cloud.value},
+              datatype: "json",
+              beforeSend: function(){
+                   while(dcdiv.firstChild){
+                      dcdiv.removeChild(dcdiv.firstChild);
+                   }
+                   while(dsdiv.firstChild){
+                      dsdiv.removeChild(dsdiv.firstChild);
+                   }
+                   while(DCenterdiv.firstChild){
+                      DCenterdiv.removeChild(DCenterdiv.firstChild);
+                   }
+                   
+                   $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )
+                  $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCdiv" )
+                  $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+                  $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DSdiv" )
+                  $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+                  $( " <p id='pp' name='pp'>please wait ...</p>" ).appendTo( "#DCenterDiv" )
+              },
+              complete: function(){
+                  
+              },
+              success: function (res) {
+                  while(dcdiv.firstChild){
+                      dcdiv.removeChild(dcdiv.firstChild);
+                   }
+                   while(dsdiv.firstChild){
+                      dsdiv.removeChild(dsdiv.firstChild);
+                   }
+                   while(DCenterdiv.firstChild){
+                      DCenterdiv.removeChild(DCenterdiv.firstChild);
+                   }
+                   
+              $( " <label>Cluster</label>" ).appendTo( "#DCdiv" )   
+              $( " <select   class='form-control' id='Cluster' name='Cluster'></select>" ).appendTo( "#DCdiv" )
+              $( " <label>Data Store</label>" ).appendTo( "#DSdiv" )
+              $( " <select   class='form-control' id='DS' name='DS'></select>" ).appendTo( "#DSdiv" )
+              $( " <label>Data Center</label>" ).appendTo( "#DCenterDiv" )
+              $( " <select   class='form-control' id='DCenter' name='DCenter'></select>" ).appendTo( "#DCenterDiv" )
+                  //new added for test
+              var cluster =document.getElementById("Cluster");
+              var DCenter =document.getElementById("DCenter");
+              var dataStore = document.getElementById("DS");
+                  console.log(res.cl)
+                  /*var option=document.createElement("option");
+                  option.text="{{user.email}}"
+                  cluster.add(option)*/
+              if(isArray(res.cl)){
+                  for(cl of res.cl){
+                  console.log(cl.Name)
+                  var option=document.createElement("option");
+                  option.text=cl.Name 
+                  if(cl.Name === "{{user.cluster}}"){
+                  option.selected =true;
+                  }
+                  cluster.add(option)
+                  }
+              }else{
+                  console.log(res.cl.Name)
+                  var option=document.createElement("option");
+                  option.text=res.cl.Name 
+                  if(res.cl.Name === "{{user.cluster}}"){
+                  option.selected =true;
+                  }
+                  cluster.add(option)
+              }
+              if(isArray(res.dcenter)){
+                  for(d of res.dcenter){
+                  console.log(d.name)
+                  var option=document.createElement("option");
+                  option.text=d.Name 
+                  if(d.Name === "{{user.dc}}"){
+                  option.selected =true;
+                  }
+                  DCenter.add(option)
+                  }
+              }else{
+                  console.log(res.dcenter.Name)
+                  var option=document.createElement("option");
+                  option.text=res.dcenter.Name 
+                  if(res.dcenter.Name === "{{user.dc}}"){
+                  option.selected =true;
+                  }
+                  DCenter.add(option)
+              }
+              if ( {{vm.name | json_encode()}} != null) {
+                  var option=document.createElement("option");
+                  option.text= {{vm.ds | json_encode()}};
+                  dataStore.add(option)
+              
+                }else{    
+              for (ds of res.ds){
+                  console.log(ds.Name)
+                  var option=document.createElement("option");
+                  option.text=''+ds.Name+'|'+ds.FreeSpaceGB+' GB';
+                  if(ds.Name === "{{user.ds}}"){
+                  option.selected =true;
+                  
+                  }
+                  dataStore.add(option)
+              }}
+              }
+           });
+      
+  
+  
+      });
+  
+  
+  };
 
 function selc(){
     

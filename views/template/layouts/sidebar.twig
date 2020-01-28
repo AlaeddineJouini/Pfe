@@ -106,6 +106,7 @@
                         </a>
                     </li>
                     {% endif %}
+                    {% if user.role =="admin" or user.role =="super" %}
                 <li class="nav-item">
                     <a class="nav-link " href="/users/getUsers">
                         <i class="ni ni-planet text-blue"></i>
@@ -124,13 +125,14 @@
                         Data Center
                     </a>
                 </li>
+                {% endif %} 
                 <li class="nav-item">
                         <a class="nav-link " href="/vm/addVm">
                             <i class="ni ni-planet text-blue"></i>
                             Add VM
                         </a>
                     </li>
-                    
+                   
                 <li class="nav-item">
                     {% if user.role =="admin" or user.role =="super" %}
                     

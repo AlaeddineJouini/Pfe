@@ -1177,7 +1177,7 @@ console.log(terrafapp)
 
 
 router.get('/getVMs',async function (req,res) {
-  if (req.isAuthenticated() && req.user.isAdmin()){
+  if  (req.isAuthenticated() && ((req.user.isAdmin())||req.user.isSuper())){
     vm.find({})
     .populate('disk')
     .populate('cloud')
@@ -1214,7 +1214,7 @@ router.get('/getMyVms', async function (req, res, next) {
 
 
   router.get('/getUserVms/:id', async function (req, res, next) {
-    if (req.isAuthenticated() && req.user.isAdmin()){
+  if (req.isAuthenticated() && ((req.user.isAdmin())||req.user.isSuper())){
      vm.find({user : req.params.id})
      .populate('disk')
     //  .populate('dc')
@@ -1286,8 +1286,575 @@ router.get('/getMyVms', async function (req, res, next) {
   
   });
 
-  router.post('/userAddvm',function (req,res) {
-    if (req.isAuthenticated() && req.user.isActivated() ){
+  router.post('/userAddvm', function (req,res) {
+     if (req.isAuthenticated() && req.user.isActivated() ){
+    let obj = [];
+    for (var i = 1; i <= req.body.selectList; i++){
+    let disk='disk'+i;
+    let ndisk=null;
+    let per = false;
+    console.log(req.body[disk])
+    
+  if(req.body['pdisk' + i]=='on'){
+    ndisk =req.body['namepdisk'+i];
+    per= true;
+    }
+    let dsk = new diskModel({
+        name : ndisk,
+        size : req.body[disk],
+        persistent : per
+    });
+    dsk.save();
+    obj.push(dsk._id);
+    }
+    console.log(obj);
+    let net = {
+       "ip" : req.body['ip1'],
+       "vlan" :req.body['vlan1'] ,
+       "cidr" :req.body['cidr1'] ,
+       "numberOfNetworks" : req.body.selectListnet
+    }
+    User.findById(req.user._id).then( us=>{
+    osType.findOne({type : req.body.selectListOS}).then(osT=>{
+        osName.findOne({name : req.body.detailListOS}).then(osN=>{
+            c.findOne({name : us.cloud}).then(async cloud=>{
+              const ps = new node_powershell_1.default({
+                executionPolicy: 'Bypass',
+                noProfile: true,})
+                let nvm= new vm({
+                  "name" : req.body.vmname,
+                  'cloud' :cloud._id,
+                  "cpus": req.body.cpus,
+                  "cluster" :us.cluster,
+                  "dc": us.dc,
+                  "ds": us.ds,
+                  "disk" :obj,
+                  "network" :{
+                    "ip" : req.body.ip,
+                    "vlan" : us.vlan,
+                    "cidr" :us.cidr,
+                    "numberOfNetworks" :req.body.selectListnet
+                  },
+                  "memory" :req.body.ram,
+                  "vmpw":req.body.vmpw,
+                  "dn" :us.dn,
+                  "dns": us.dns,
+                  "gw" : us.gw,
+                  "projectFolder" : us.email,
+                  "osType" : osT._id,
+                  "os" : osN._id,
+                  "user" : req.user._id
+                })
+                    vm.create(nvm);
+                    res.send({nvm})
+                    let Object = {
+                      "available" : false
+                    };
+                    ipModel.updateOne({ip :req.body.ip},Object,err=>{
+                      if (err)
+                      console.log(err)
+                    })
+                    
+
+                    var nbDisks      = req.body.selectList;
+                    var vmName       = req.body.vmname;
+                    var folder       = us.email;
+                    var nbNet        = req.body.selectListnet;
+                    var os           = req.body.selectListOS;
+                    var osDetail     = req.body.detailListOS;
+                    var cluster      = us.cluster;
+                    var ds           = us.ds;
+                    var cpus         = req.body.cpus;
+                    var ram          = req.body.ram;
+                    var dn           = us.dn;
+                    var gw           = us.gw;
+                    var dns          = us.dns;
+                    var vmpass       = req.body.vmpw;
+                    var dcenter      = us.dc;
+                    let URL = cloud.adress;
+                    let username = cloud.user ;
+                    let password = cloud.password;
+                    const port = 443;
+                    console.log(!fs.existsSync(folder))
+                    let slp= ds.split("|");
+                    if (!fs.existsSync(folder)){
+                      console.log('Disabling SSL Cert Test');
+                            const disableAuth = await run_1.run(ps, 'Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false');
+                            console.log(`Disabling Auth Done: ${disableAuth}`);
+                            console.log('Login into vCenter');
+                            const test = await run_1.run(ps, `Connect-VIServer -Server ${URL} -Port ${port}  -Protocol https -Username ${username} -Password ${password}`);
+                            console.log(test);
+                            const CrFolder = await run_1.run(ps, `New-Folder -Name ${folder} -Location (Get-Datacenter -Name ${dcenter} | Get-Folder -Name VM)`);
+                            console.log(CrFolder);   
+                            console.log('here and here')       
+                      }
+
+                 try { 
+                      if (!fs.existsSync('Persistent')){
+                        fs.mkdirSync('Persistent')
+                      }
+                    } catch (err) {
+                      console.error(err)
+                    }
+                    try { 
+                      if (!fs.existsSync('Persistent/'+folder)){
+                        fs.mkdirSync('Persistent/'+folder)
+                      }
+                    } catch (err) {
+                      console.error(err)
+                    }
+                    try { 
+                      if (!fs.existsSync('Persistent/'+folder+'/'+vmName)){
+                        fs.mkdirSync('Persistent/'+folder+'/'+vmName)
+                      }
+                    } catch (err) {
+                      console.error(err)
+                    }
+                    
+
+                    for (var i = 1; i <= nbDisks; i++){
+                      let disk='disk'+i;
+                      let ndisk=req.body['namepdisk'+i];
+                      console.log(req.body[disk])
+                    if(req.body['pdisk' + i]=='on'){try{ 
+                      fs.appendFileSync('Persistent/'+folder+'/'+vmName+'/'+ndisk,'resource "vsphere_virtual_disk" '+ndisk+'" { \n'+
+                         ' size         ='+req.body[disk] +'  \n'+
+                         'vmdk_path    = "${var.extra_vmdk_name}"\n'+
+                         'datacenter   = "${var.datacenter}"\n'+
+                         'datastore    = "${var.datastore}"\n'+
+                         'type         = "thin"\n'+
+                        'adapter_type = "lsiLogic"\n'+
+                        '}\n'+
+                        '\n'
+                        ,'UTF8')}
+                      catch(err){
+                        
+                          console.log('hahaha');
+                      };
+                    }
+                  }
+
+                  try { 
+                    if (!fs.existsSync(folder)){
+                      fs.mkdirSync(folder)
+                    }
+                  } catch (err) {
+                    console.error(err)
+                  }
+                  try { 
+                    if (!fs.existsSync(folder+'/'+vmName)){
+                      fs.mkdirSync(folder+'/'+vmName)
+                    }
+                  } catch (err) {
+                    console.error(err)
+                  }
+
+
+                  
+
+                  try{ 
+                    fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'vars.tf',
+                    'variable "vm_name" { \n'+
+                     ' description = "VMware vSphere Virtual Machine Name"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_cpus" {\n'+
+                      'description = "Number of vCPUs"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_memory" {\n'+
+                      'description = "Amount of memory assigned to the virtual machine"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_domain_name" {\n'+
+                      'description = "Virtual machine domain name"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_ip_address" {\n'+
+                      'description = "Virtual machine IP address"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_default_gateway" {\n'+
+                      'description = "Virtual machine default gateway"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_network_cidr" {\n'+
+                      'description = "Virtual machine network cidr"\n'+
+                      'default = 28\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_dns_server" {\n'+
+                      'description = "Virtual machine dns server"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_folder_name" {\n'+
+                      'description = "VM installatino folder"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vm_host_password" {\n'+
+                      'description = "Root password for ssh purpose"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vsphere_user" {\n'+
+                      'description = "vSphere user"\n'+
+                    '}\n'+
+                    ' \n'+
+                    'variable "vsphere_password" {\n'+
+                      'description = "vsphere password"\n'+
+                      'default = "H@touti2018"\n'+
+                    '}\n'+
+                    ' \n'+ 
+                    'variable "vsphere_server" {\n'+
+                      'description = "vsphere server"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vsphere_datacenter" {\n'+
+                      'description = "VMware vSphere Datacenter Name"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vsphere_cluster" {\n'+
+                      'description = "VMware vSphere Computer Cluster Name"\n'+
+                    '}\n'+
+                    '\n'+
+                    'variable "vsphere_datastore" {\n'+
+                    'description = "VMware vSphere Datastore"\n'+
+                  '}\n'+
+                  '\n'+
+                  'variable "vsphere_template" {\n'+
+                    'description = "VMware Template"\n'+
+                  '}\n'+
+                  '\n'
+                    ,'UTF8');
+                  }
+                  catch(err){
+                    console.error(err)
+                  }
+
+                  for(i = 1;i <= nbNet; i++){
+                    try{ fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'vars.tf',
+                    'variable "vsphere_network'+i+'" {\n'+
+                      'description = "VMware vSphere Network'+i+' Name"\n'+
+                    '}\n'+
+                    '\n'
+                    ,'UTF8');}
+
+                    catch (err){
+                      console.error(err)
+                    }}
+
+
+                    try{
+                      fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf',
+                      
+                      
+                      
+                      
+                      
+                      'provider "vsphere" { \n'+
+                      '  version = "1.10.0" \n'+
+                      '  user           = "${var.vsphere_user}"\n'+
+                      '  password       = "${var.vsphere_password}" \n'+
+                      '  vsphere_server = "${var.vsphere_server}"\n'+
+                        '\n'+
+                      ' # If you have a self-signed cert \n'+
+                      ' allow_unverified_ssl = true \n'+
+                      '}\n'+
+                      '\n'+
+                      'data "vsphere_datacenter" "dc" {\n'+
+                      '  name = "${var.vsphere_datacenter}"\n'+
+                      '}\n'+
+                      '\n'+
+                      'data "vsphere_datastore" "datastore" {\n'+
+                      '  name          = "${var.vsphere_datastore}"\n'+
+                      '  datacenter_id = "${data.vsphere_datacenter.dc.id}"\n'+
+                      '}\n'+
+                      '\n'+
+                      'data "vsphere_compute_cluster" "cluster" {\n'+
+                      '  name          = "${var.vsphere_cluster}"\n'+
+                      '  datacenter_id = "${data.vsphere_datacenter.dc.id}"\n'+
+                      '}\n'+
+                      'data "vsphere_virtual_machine" "template" {\n'+
+                      '  name          = "${var.vsphere_template}"\n'+
+                      '  datacenter_id = "${data.vsphere_datacenter.dc.id}"\n'+
+                      '}\n'
+                    
+                      ,'UTF8');}
+                      
+                      catch(err){console.error(err)}
+
+                      for(i = 1;i <= nbNet; i++){
+                        try{ fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf',
+                      
+                        'data "vsphere_network" "network'+i+'" {\n'+
+                        '  name          = "${var.vsphere_network'+i+'}"\n'+
+                        '  datacenter_id = "${data.vsphere_datacenter.dc.id}"\n'+
+                        '}\n'
+                     
+                        ,'utf8');
+                      
+                        }
+                        catch(err){
+                          console.error(err)
+                        }
+                      }
+
+
+                      try{ fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf',
+  
+/*'resource "vsphere_folder" "folder" { \n'+
+'path          = "'+folder+'"\n'+
+'type          = "vm"\n'+
+'datacenter_id = "${data.vsphere_datacenter.dc.id}"\n'+
+'}\n'+ */
+'resource "vsphere_virtual_machine" "'+vmName+'" {  \n'+
+'  name             = "${var.vm_name}"\n'+
+'  folder           = "${var.vm_folder_name}"\n'+
+'  num_cpus         = "${var.vm_cpus}"\n'+
+'  memory           = "${var.vm_memory}"\n'+
+'  resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"\n'+
+'  datastore_id     = "${data.vsphere_datastore.datastore.id}"\n'+
+'  \n'+
+'  guest_id         = "${data.vsphere_virtual_machine.template.guest_id}"\n'+
+'  scsi_type        = "${data.vsphere_virtual_machine.template.scsi_type}"\n'+
+'network_interface {\n'+
+'  network_id   = "${data.vsphere_network.network1.id}"\n'+
+'  adapter_type = "${data.vsphere_virtual_machine.template.network_interface_types[0]}"\n'+
+'}\n'
+
+  ,'utf8');
+
+  }
+  catch(err){
+    console.error(err)
+  }
+
+
+
+  if(nbNet>=2){
+    for(i=2;i<=nbNet;i++){
+    try{ 
+      fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf',
+      
+      
+      'network_interface {\n'+
+      '  network_id   = "${data.vsphere_network.network'+i+'.id}"\n'+
+      '  adapter_type = "vmxnet3"\n'+
+      '}\n'
+    
+      ,'UTF8');
+    
+    }
+    catch(err){
+      console.error(err)
+    }}}
+
+
+
+    try{
+
+      fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf',
+      
+      
+      'disk {\n'+
+        '  label            = "disk0"\n'+
+        '  size             = "'+req.body["disk"+1]+'"\n'+
+        '  eagerly_scrub    = "${data.vsphere_virtual_machine.template.disks.0.eagerly_scrub}"\n'+
+        '  thin_provisioned = "${data.vsphere_virtual_machine.template.disks.0.thin_provisioned}"\n'+
+      '}\n'
+  
+      ,'UTF8');
+    
+    }
+    catch(err){console.error(err)}
+
+
+   /* try{
+
+      for(i=1;i<=nbDisks;i++){
+        if(req.body['pdisk' + i]=='on')
+        {
+          fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf','**not ready yet** \n','UTF8');
+        }
+        else{
+          fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf',
+          
+          'disk {\n'+
+            'label	     = "disk'+i+'"\n'+
+            'size             ='+req.body["disk"+i]+' \n'+
+            'unit_number      = '+i+'\n'+
+            'thin_provisioned = true\n'+
+          '}\n'
+    
+          ,'UTF8');
+        }}}
+      catch(err){console.error(err)}  
+      */
+
+      try{ 
+        fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.main.tf',
+        
+        'clone {\n'+
+          'template_uuid = "${data.vsphere_virtual_machine.template.id}"\n'+
+         '\n'+
+          'customize {\n'+
+            'linux_options {\n'+
+              'host_name = "${var.vm_name}"\n'+
+              'domain    = "${var.vm_domain_name}"\n'+
+            '}\n'+
+        '\n'+
+            'network_interface {\n'+
+              'ipv4_address = "${var.vm_ip_address}"\n'+
+              'ipv4_netmask = "${var.vm_network_cidr}"\n'+
+            '}\n'+
+         
+        '\n'+
+            'dns_server_list = ["${var.vm_dns_server}"]\n'+
+            'ipv4_gateway = "${var.vm_default_gateway}"\n'+
+          '}\n'+
+        '}\n'+
+        '}\n'
+        
+        ,'utf8')
+        }
+        catch(err){
+          console.error(err)
+        }
+
+
+        try{ 
+          let ip=req.body['ip'];
+          let cidr=us.cidr;
+          let vlan1= us.vlan;
+          let sp= ds.split("|");
+          console.log(sp)
+        fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.auto.tfvars',
+        
+        'vm_name                      = "'+ vmName +'"\n'+
+        'vm_cpus                      = "'+ cpus +'"\n'+
+        'vm_memory                    = "'+ram *1024 +'"\n'+
+        'vm_domain_name               = "'+ dn +'"\n'+
+        'vm_ip_address                = "'+ ip +'"\n'+
+        'vm_network_cidr              = "'+ cidr+'"\n'+
+        'vm_default_gateway           = "'+ gw +'"\n'+
+        'vm_dns_server                = "'+ dns  +'"\n'+
+        'vm_folder_name               = "'+ folder +'"\n'+
+        'vm_host_password             = "'+ vmpass +'"\n'+
+        'vsphere_server               = "'+ cloud.adress +'"\n'+
+        'vsphere_user                 = "'+ cloud.user +'"\n'+
+        'vsphere_password             = "'+ cloud.password +'"\n'+
+        'vsphere_datacenter           = "'+ dcenter +'"\n'+
+        'vsphere_cluster              = "'+ cluster +'"\n'+
+        'vsphere_datastore            = "'+ sp[0] +'"\n'+
+        'vsphere_network1              = "VMNet_Vlan-'+vlan1+'"\n'+
+        'vsphere_template             = "templates/'+osDetail +'"\n'
+        
+        
+        ,'utf8')
+        
+        }
+        catch(err){console.error(err)}
+        
+        
+       /* if(nbNet>=2){
+          for(i=2;i<=nbNet;i++){
+          let vlan= req.body['vlan'+i];
+          try{
+            fs.appendFileSync(folder+'/'+vmName+'/'+vmName+'.auto.tfvars',
+            
+          'vsphere_network'+i+'           = "VMNet_Vlan-'+vlan +'_"\n'
+      
+            ,'utf8')
+        
+          }
+          catch(err){console.error(err)}
+          }}*/
+
+
+      
+          
+              
+              const pathvm= folder+'/'+vmName
+              const terrapath= await run_1.run(ps,`cd ${pathvm} `);
+              console.log(terrapath)
+              const terrafin = await run_1.run(ps,`Terraform init `);
+              console.log(terrafin)
+              const terrafplan = await run_1.run(ps,`Terraform plan -out test `);
+              console.log(terrafplan)
+              const terrafapp = await run_1.run(ps,`Terraform apply test `);
+              console.log(terrafapp)
+              
+            
+       /*   else {
+            const pathvm= folder+'/'+vmName
+            const terrapath= await run_1.run(ps,`cd ${pathvm} `);
+            console.log(terrapath)
+            const terrafin = await run_1.run(ps,`Terraform init `);
+            console.log(terrafin)
+            const terrafplan = await run_1.run(ps,`Terraform plan -out test `);
+            console.log(terrafplan)
+            const terrafapp = await run_1.run(ps,`Terraform apply test `);
+            console.log(terrafapp)
+          }
+*/
+         
+        
+          
+                 
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            }).catch(e=>{
+                console.log(e)
+                console.log('notfound')
+            })
+           
+            
+
+        }).catch(error=>{
+            console.log(error)
+        })
+    }).catch(err=>{
+        console.log(err)
+    }).catch(er=>
+      console.log(er))
+    })
+    
+    //res.redirect('/dataCenter/listDc');
+       
+} else {
+    res.sendStatus(403) // Forbidden
+   }
+
+});
+
+
+
+
+
+
+
+
+
+
+   /* if (req.isAuthenticated() && req.user.isActivated() ){
       let obj = [];
       for (var i = 1; i <= req.body.selectList; i++){
       let disk='disk'+i;
@@ -1307,12 +1874,14 @@ router.get('/getMyVms', async function (req, res, next) {
       dsk.save();
       obj.push(dsk._id);
       }
-      User.findById(req.user._id)
-      .exec((err,doc)=>{
-        if(err) return err;
+      User.findById(req.user._id).then( doc=>{
+       
         c.findOne({name : doc.cloud}).then(cloud=>{
           osType.findOne({type : req.body.selectListOS}).then(osT=>{
-            osName.findOne({name : req.body.detailListOS}).then(osN=>{
+            osName.findOne({name : req.body.detailListOS}).then(async   osN=>{
+              const ps = new node_powershell_1.default({
+                executionPolicy: 'Bypass',
+                noProfile: true,})
           let nvm= new vm({
             "name" : req.body.vmname,
             'cloud' :cloud._id,
@@ -1376,6 +1945,22 @@ router.get('/getMyVms', async function (req, res, next) {
       var vmpass       = req.body.vmpw;
       var dcenter      = doc.dc;
 
+      let URL = cloud.adress;
+      let username = cloud.user ;
+      let password = cloud.password;
+      const port = 443;
+      console.log(!fs.existsSync(folder))
+      let slp= ds.split("|");
+      if (!fs.existsSync(folder)){
+        console.log('Disabling SSL Cert Test');
+              const disableAuth = await run_1.run(ps, 'Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false');
+              console.log(`Disabling Auth Done: ${disableAuth}`);
+              console.log('Login into vCenter');
+              const test = await run_1.run(ps, `Connect-VIServer -Server ${URL} -Port ${port}  -Protocol https -Username ${username} -Password ${password}`);
+              console.log(test);
+              const CrFolder = await run_1.run(ps, `New-Folder -Name ${folder} -Location (Get-Datacenter -Name ${dcenter} | Get-Folder -Name VM)`);
+              console.log(CrFolder);          
+        }
       try {
         if (!fs.existsSync('Persistent')){
           fs.mkdirSync('Persistent')
@@ -1740,12 +2325,21 @@ catch(err){console.error(err)}
 })
   
       /////end config
+      const pathvm= folder+'/'+vmName
+      const terrapath= await run_1.run(ps,`cd ${pathvm} `);
+      console.log(terrapath)
+      const terrafin = await run_1.run(ps,`Terraform init `);
+      console.log(terrafin)
+      const terrafplan = await run_1.run(ps,`Terraform plan -out test `);
+      console.log(terrafplan)
+      const terrafapp = await run_1.run(ps,`Terraform apply test `);
+      console.log(terrafapp)
       res.send('added')
-        }) 
+        }).catch(errr=>{}) 
     } else {
       res.sendStatus(403) // Forbidden
      }
-  })
+  })*/
 
   /////////////////////////////////////////////////
 
@@ -2156,7 +2750,43 @@ catch(err){console.error(err)}
 
   router.get('/AdminDelVm/:id', function (req, res, next) {
     
-      if (req.isAuthenticated() && req.user.isAdmin()){
+      if (req.isAuthenticated() && ((req.user.isAdmin())||(req.user.isSuper()))){
+
+        let folder
+        let vmName
+        vm.findById(req.params.id).then(data =>{
+         folder=data.projectFolder 
+         vmName=data.name
+        }).catch((err) => {
+          res.setHeader('Status', 500)
+          res.json(err);
+      })
+    
+        vm.deleteOne({ _id: req.params.id }).then( async doc => {
+          const ps = new node_powershell_1.default({
+            executionPolicy: 'Bypass',
+            noProfile: true,})
+            const pathvm= folder+'/'+vmName
+            const terrapath= await run_1.run(ps,`cd ${pathvm} `);
+            console.log(pathvm)
+            console.log("planning")
+            //const terra= await run_1.run(ps,`dir `);
+            //console.log(terra)
+            const terraDest = await run_1.run(ps,`Terraform destroy -force `);
+            console.log(terraDest)
+            
+            res.redirect('/vms/getVMs');
+        }).catch((err) => {
+            res.setHeader('Status', 500)
+            res.json(err);
+        })
+    } else {
+        res.sendStatus(403) // Forbidden
+       }
+    });
+    router.get('/UserDelVm/:id', function (req, res, next) {
+    
+      if (req.isAuthenticated()){
 
         let folder
         let vmName
@@ -2181,7 +2811,7 @@ catch(err){console.error(err)}
             const terraDest = await run_1.run(ps,`Terraform destroy -force `);
             console.log(terraDest)
             
-            res.send('deleted');
+            res.redirect('/vms/getVMs');
         }).catch((err) => {
             res.setHeader('Status', 500)
             res.json(err);
