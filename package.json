@@ -28,7 +28,7 @@
     "express": "~4.16.1",
     "express-session": "^1.15.5",
     "http-errors": "~1.6.3",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "mongoose": "^5.4.13",
     "morgan": "~1.9.1",
     "node-powershell": "^4.0.0",
