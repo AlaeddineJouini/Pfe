@@ -25,7 +25,7 @@
     "countup": "^1.8.2",
     "debug": "~2.6.9",
     "easy-pie-chart": "^2.1.7",
-    "express": "~4.16.1",
+    "express": "~4.17.3",
     "express-session": "^1.15.5",
     "http-errors": "~1.6.3",
     "jquery": "^3.4.1",
